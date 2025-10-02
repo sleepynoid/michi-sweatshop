@@ -6,6 +6,7 @@ export interface User {
 }
 
 export interface UserResponse {
+  id: number;
   username: string;
   name: string;
   role: string;
@@ -33,8 +34,9 @@ export interface UpdateUserRequest {
   role?: string;
 }
 
-export function toUserRespons(user: User): UserResponse {
+export function toUserRespons(user: any): UserResponse {
   return{
+    id: user.id,
     name: user.name,
     username: user.username,
     role: user.role

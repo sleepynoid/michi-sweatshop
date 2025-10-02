@@ -58,9 +58,27 @@ export class UserService {
 
         const token = crypto.randomUUID()
 
+        // Update user with token
+        await prismaClient.user.update({
+            where: { id: isUserExist.id },
+            data: { token }
+        })
+
         return {
             ...toUserRespons(isUserExist),
             token
         }
+    }
+
+    static async get(token: string): Promise<UserResponse> {
+        const user = await prismaClient.user.findFirst({
+            where: { token }
+        });
+
+        if (!user) {
+            throw new HTTPException(401, { message: "Unauthorized" });
+        }
+
+        return toUserRespons(user);
     }
 }

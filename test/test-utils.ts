@@ -2,8 +2,10 @@ import { prismaClient } from "../src/Application/database";
 
 export class UserTest {
     static async create() {
-        await prismaClient.user.create({
-            data: {
+        await prismaClient.user.upsert({
+            where: { username: "test" },
+            update: {},
+            create: {
                 username: "test",
                 name: "test",
                 password: await Bun.password.hash("test123", {
@@ -26,6 +28,36 @@ export class UserTest {
         return await prismaClient.user.findUnique({
             where: {
                 username: username
+            }
+        })
+    }
+}
+
+export class ItemTest {
+    static async create() {
+        await prismaClient.item.create({
+            data: {
+                name: "Test Item",
+                description: "Test Description",
+                price: 100000,
+            }
+        })
+    }
+
+    static async delete() {
+        await prismaClient.item.deleteMany({
+            where: {
+                name: {
+                    in: ["Test Item", "Figure", "Updated Item"]
+                }
+            }
+        })
+    }
+
+    static async findByName(name: string) {
+        return await prismaClient.item.findFirst({
+            where: {
+                name: name
             }
         })
     }

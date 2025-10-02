@@ -13,14 +13,14 @@ export interface ItemResponse {
   name: string;
   description: string;
   price: number;
-  userId: number;
+  // userId: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateItemRequest {
   name: string;
-  description: string;
+  description?: string;
   price: number;
 }
 
@@ -45,12 +45,12 @@ export interface ItemDetailResponse {
   name: string;
   description: string;
   price: number;
-  user: {
-    id: number;
-    username: string;
-    name: string;
-    role: string;
-  };
+  // user: {
+  //   id: number;
+  //   username: string;
+  //   name: string;
+  //   role: string;
+  // };
   createdAt: Date;
   updatedAt: Date;
 }

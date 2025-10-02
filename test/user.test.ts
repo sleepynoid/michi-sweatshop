@@ -96,7 +96,7 @@ describe('POST /api/users/login' ,() => {
         expect(body.data.token).toBeDefined()
     })
 
-    it('should reject login for non-existing user', async () => {
+    it('should reject login for non-existing username ', async () => {
         await UserTest.create()
 
         const response = await app.request('/api/users/login', {
@@ -104,6 +104,24 @@ describe('POST /api/users/login' ,() => {
             body: JSON.stringify({
                 username: 'paijo',
                 password: 'test123'
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(401)
+        expect(body.errors).toBeDefined()
+    })
+
+    it('should reject login for non-existing password ', async () => {
+        await UserTest.create()
+
+        const response = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test12345'
             })
         })
 
