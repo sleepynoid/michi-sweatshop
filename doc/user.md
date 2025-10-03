@@ -31,7 +31,16 @@ Response Body (Failed) :
 
 ```json
 {
-  "errors" : "Username must not blank, ..."
+  "errors" : [
+    {
+      "field" : "username",
+      "message" : "Username must not be blank"
+    },
+    {
+      "field" : "password",
+      "message" : "Password must not be blank"
+    }
+  ]
 }
 ```
 

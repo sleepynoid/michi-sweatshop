@@ -36,7 +36,16 @@ Response Body (Failed) :
 
 ```json
 {
-  "errors" : "Validation error message"
+  "errors" : [
+    {
+      "field" : "name",
+      "message" : "Name must not be blank"
+    },
+    {
+      "field" : "price",
+      "message" : "Price must be a positive number"
+    }
+  ]
 }
 ```
 
@@ -165,7 +174,12 @@ Response Body (Failed) :
 
 ```json
 {
-  "errors" : "Validation error message"
+  "errors" : [
+    {
+      "field" : "price",
+      "message" : "Price must be a positive number"
+    }
+  ]
 }
 ```
 

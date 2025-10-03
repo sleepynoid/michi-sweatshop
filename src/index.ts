@@ -53,7 +53,10 @@ app.onError(async (err, c) => {
   } else if (err instanceof ZodError) {
     c.status(400)
     return c.json({
-      errors: err.message
+      errors: err.issues.map(issue => ({
+        field: issue.path[0] as string,
+        message: issue.message
+      }))
     })
   } else {
     c.status(500)

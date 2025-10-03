@@ -53,6 +53,28 @@ export const openApiSpec = {
                 }
               }
             }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          field: { type: 'string' },
+                          message: { type: 'string' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -93,6 +115,41 @@ export const openApiSpec = {
                         token: { type: 'string' }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          field: { type: 'string' },
+                          message: { type: 'string' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Invalid credentials',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
                   }
                 }
               }
@@ -196,6 +253,41 @@ export const openApiSpec = {
                 }
               }
             }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          field: { type: 'string' },
+                          message: { type: 'string' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -230,6 +322,19 @@ export const openApiSpec = {
                         updatedAt: { type: 'string', format: 'date-time' }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Item not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
                   }
                 }
               }
@@ -286,6 +391,54 @@ export const openApiSpec = {
                 }
               }
             }
+          },
+          400: {
+            description: 'Validation error',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          field: { type: 'string' },
+                          message: { type: 'string' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Item not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -309,6 +462,32 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     data: { type: 'boolean' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Item not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
                   }
                 }
               }
@@ -347,6 +526,19 @@ export const openApiSpec = {
                         updatedAt: { type: 'string', format: 'date-time' }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Item not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
                   }
                 }
               }
