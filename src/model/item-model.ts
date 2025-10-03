@@ -1,15 +1,15 @@
 export interface Item {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
-  userId: number;
+  // userId: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ItemResponse {
-  id: number;
+  uuid: string;
   name: string;
   description: string;
   price: number;
@@ -41,7 +41,7 @@ export interface PaginatedItemsResponse {
 }
 
 export interface ItemDetailResponse {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;

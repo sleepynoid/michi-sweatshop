@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
+    "@scalar/hono-api-reference": "^0.9.19",
     "hono": "^4.9.9",
     "winston": "^3.17.0",
     "zod": "^4.1.11"

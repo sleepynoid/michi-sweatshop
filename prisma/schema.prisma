@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  uuid        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
   name      String
@@ -27,7 +27,7 @@ model User {
 }
 
 model Item {
-  id          Int      @id @default(autoincrement())
+  uuid          String   @id @default(cuid())
   name        String
   description String
   price       Int

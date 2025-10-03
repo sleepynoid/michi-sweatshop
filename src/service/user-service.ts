@@ -60,7 +60,7 @@ export class UserService {
 
         // Update user with token
         await prismaClient.user.update({
-            where: { id: isUserExist.id },
+            where: { uuid: isUserExist.uuid },
             data: { token }
         })
 

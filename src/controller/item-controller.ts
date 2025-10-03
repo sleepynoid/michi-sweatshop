@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { CreateItemRequest, UpdateItemRequest } from "../model/item-model";
 import { ItemService } from "../service/item-service";
-import { authMiddleware } from "../middleware/auth-middleware";
 
 export const ItemController = new Hono()
 
@@ -25,7 +24,7 @@ ItemController.get('/api/items', async (c) => {
 })
 
 ItemController.get('/api/items/:id', async (c) => {
-    const itemId = parseInt(c.req.param('id'))
+    const itemId = c.req.param('id')
 
     const response = await ItemService.getById(itemId)
 
@@ -35,7 +34,7 @@ ItemController.get('/api/items/:id', async (c) => {
 })
 
 ItemController.get('/api/items/:id/detail', async (c) => {
-    const itemId = parseInt(c.req.param('id'))
+    const itemId = c.req.param('id')
 
     const response = await ItemService.getDetail(itemId)
 
@@ -45,7 +44,7 @@ ItemController.get('/api/items/:id/detail', async (c) => {
 })
 
 ItemController.patch('/api/items/:id', async (c) => {
-    const itemId = parseInt(c.req.param('id'))
+    const itemId = c.req.param('id')
     const request = await c.req.json() as UpdateItemRequest
 
     const response = await ItemService.update(itemId, request)
@@ -56,7 +55,7 @@ ItemController.patch('/api/items/:id', async (c) => {
 })
 
 ItemController.delete('/api/items/:id', async (c) => {
-    const itemId = parseInt(c.req.param('id'))
+    const itemId = c.req.param('id')
 
     const response = await ItemService.delete(itemId)
 

@@ -14,13 +14,15 @@ Request Body :
 }
 ```
 
-Response Body (Success) : 
+Response Body (Success) :
 
 ```json
 {
   "data" : {
+    "id" : 1,
     "username" : "khannedy",
-    "name" : "Eko Kurniawan Khannedy"
+    "name" : "Eko Kurniawan Khannedy",
+    "role" : "user"
   }
 }
 ```
@@ -37,7 +39,7 @@ Response Body (Failed) :
 
 Endpoint : POST /api/users/login
 
-Request Body : 
+Request Body :
 
 ```json
 {
@@ -51,69 +53,19 @@ Response Body (Success) :
 ```json
 {
   "data" : {
+    "id" : 1,
     "username" : "khannedy",
     "name" : "Eko Kurniawan Khannedy",
+    "role" : "user",
     "token" : "token"
   }
 }
 ```
 
-## Get User
-
-Endpoint : GET /api/users/current
-
-Request Header :
-- Authorization : token
-
-Response Body (Success) :
+Response Body (Failed) :
 
 ```json
 {
-  "data" : {
-    "username" : "khannedy",
-    "name" : "Eko Kurniawan Khannedy"
-  }
-}
-```
-
-## Update User
-
-Endpoint : PATCH /api/users/current
-
-Request Header :
-- Authorization : token
-
-Request Body :
-
-```json
-{
-  "name" : "Kalo mau update nama",
-  "password" : "kalo mau update password"
-}
-```
-
-Response Body (Success) :
-
-```json
-{
-  "data" : {
-    "username" : "khannedy",
-    "name" : "Eko Kurniawan Khannedy"
-  }
-}
-```
-
-## Logout User
-
-Endpoint : DELETE /api/users/current
-
-Request Header :
-- Authorization : token
-
-Response Body (Success) :
-
-```json
-{
-  "data" : true
+  "errors" : "Username or password wrong"
 }
 ```

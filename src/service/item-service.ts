@@ -9,15 +9,15 @@ export class ItemService {
 
         const item = await prismaClient.item.create({
             data: {
+                uuid: crypto.randomUUID(),
                 name: request.name,
                 description: request.description || "",
                 price: request.price,
-                // userId: userId
             }
         });
 
         return {
-            id: item.id,
+            uuid: item.uuid,
             name: item.name,
             description: item.description,
             price: item.price,
@@ -43,7 +43,7 @@ export class ItemService {
 
         return {
             data: items.map(item => ({
-                id: item.id,
+                uuid: item.uuid,
                 name: item.name,
                 description: item.description,
                 price: item.price,
@@ -60,10 +60,10 @@ export class ItemService {
         };
     }
 
-    static async getById(itemId: number): Promise<ItemResponse> {
+    static async getById(itemId: string): Promise<ItemResponse> {
         const item = await prismaClient.item.findFirst({
             where: {
-                id: itemId
+                uuid: itemId
             }
         });
 
@@ -72,7 +72,7 @@ export class ItemService {
         }
 
         return {
-            id: item.id,
+            uuid: item.uuid,
             name: item.name,
             description: item.description,
             price: item.price,
@@ -82,10 +82,10 @@ export class ItemService {
         };
     }
 
-    static async getDetail(itemId: number): Promise<ItemDetailResponse> {
+    static async getDetail(itemId: string): Promise<ItemDetailResponse> {
         const item = await prismaClient.item.findFirst({
             where: {
-                id: itemId
+                uuid: itemId
             }
         });
 
@@ -94,7 +94,7 @@ export class ItemService {
         }
 
         return {
-            id: item.id,
+            id: item.uuid,
             name: item.name,
             description: item.description,
             price: item.price,
@@ -104,12 +104,12 @@ export class ItemService {
         };
     }
 
-    static async update(itemId: number, request: UpdateItemRequest): Promise<ItemResponse> {
+    static async update(itemId: string, request: UpdateItemRequest): Promise<ItemResponse> {
         request = ItemValidation.UPDATE.parse(request);
 
         const item = await prismaClient.item.findFirst({
             where: {
-                id: itemId,
+                uuid: itemId,
             }
         });
 
@@ -118,7 +118,7 @@ export class ItemService {
         }
 
         const updatedItem = await prismaClient.item.update({
-            where: { id: itemId },
+            where: { uuid: itemId },
             data: {
                 name: request.name ?? item.name,
                 description: request.description ?? item.description,
@@ -127,7 +127,7 @@ export class ItemService {
         });
 
         return {
-            id: updatedItem.id,
+            uuid: updatedItem.uuid,
             name: updatedItem.name,
             description: updatedItem.description,
             price: updatedItem.price,
@@ -137,10 +137,10 @@ export class ItemService {
         };
     }
 
-    static async delete(itemId: number): Promise<boolean> {
+    static async delete(itemId: string): Promise<boolean> {
         const item = await prismaClient.item.findFirst({
             where: {
-                id: itemId
+                uuid: itemId
             }
         });
 
@@ -149,7 +149,7 @@ export class ItemService {
         }
 
         await prismaClient.item.delete({
-            where: { id: itemId }
+            where: { uuid: itemId }
         });
 
         return true;

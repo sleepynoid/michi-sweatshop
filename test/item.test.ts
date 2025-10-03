@@ -105,26 +105,10 @@ describe('GET /api/items', () => {
     })
 
     it('should get items successfully', async () => {
-        await UserTest.create()
-        const user = await UserTest.findByUsername('test')
         await ItemTest.create()
 
-        const loginResponse = await app.request('/api/users/login', {
-            method: 'post',
-            body: JSON.stringify({
-                username: 'test',
-                password: 'test123'
-            })
-        })
-
-        const loginBody = await loginResponse.json()
-        const token = loginBody.data.token
-
         const response = await app.request('/api/items', {
-            method: 'get',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            method: 'get'
         })
 
         const body = await response.json()
@@ -144,27 +128,11 @@ describe('GET /api/items/:id', () => {
     })
 
     it('should get item by id successfully', async () => {
-        await UserTest.create()
-        const user = await UserTest.findByUsername('test')
         await ItemTest.create()
         const item = await ItemTest.findByName('Test Item')
 
-        const loginResponse = await app.request('/api/users/login', {
-            method: 'post',
-            body: JSON.stringify({
-                username: 'test',
-                password: 'test123'
-            })
-        })
-
-        const loginBody = await loginResponse.json()
-        const token = loginBody.data.token
-
-        const response = await app.request(`/api/items/${item!.id}`, {
-            method: 'get',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await app.request(`/api/items/${item!.uuid}`, {
+            method: 'get'
         })
 
         const body = await response.json()
@@ -176,24 +144,8 @@ describe('GET /api/items/:id', () => {
     })
 
     it('should reject get item if not found', async () => {
-        await UserTest.create()
-
-        const loginResponse = await app.request('/api/users/login', {
-            method: 'post',
-            body: JSON.stringify({
-                username: 'test',
-                password: 'test123'
-            })
-        })
-
-        const loginBody = await loginResponse.json()
-        const token = loginBody.data.token
-
         const response = await app.request('/api/items/999', {
-            method: 'get',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            method: 'get'
         })
 
         const body = await response.json()
@@ -201,6 +153,24 @@ describe('GET /api/items/:id', () => {
 
         expect(response.status).toBe(404)
         expect(body.errors).toBeDefined()
+    })
+
+    it('should get item detail successfully', async () => {
+        await ItemTest.create()
+        const item = await ItemTest.findByName('Test Item')
+
+        const response = await app.request(`/api/items/${item!.uuid}/detail`, {
+            method: 'get'
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(200)
+        expect(body.data).toBeDefined()
+        expect(body.data.name).toBe("Test Item")
+        expect(body.data.description).toBe("Test Description")
+        expect(body.data.price).toBe(100000)
     })
 })
 
@@ -227,7 +197,7 @@ describe('PATCH /api/items/:id', () => {
         const loginBody = await loginResponse.json()
         const token = loginBody.data.token
 
-        const response = await app.request(`/api/items/${item!.id}`, {
+        const response = await app.request(`/api/items/${item!.uuid}`, {
             method: 'patch',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -272,7 +242,7 @@ describe('DELETE /api/items/:id', () => {
         const loginBody = await loginResponse.json()
         const token = loginBody.data.token
 
-        const response = await app.request(`/api/items/${item!.id}`, {
+        const response = await app.request(`/api/items/${item!.uuid}`, {
             method: 'delete',
             headers: {
                 'Authorization': `Bearer ${token}`

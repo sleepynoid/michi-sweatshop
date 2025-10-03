@@ -22,11 +22,10 @@ Response Body (Success) :
 ```json
 {
   "data" : {
-    "id" : 1,
+    "uuid" : "550e8400-e29b-41d4-a716-446655440000",
     "name" : "Figure",
     "description" : "Figure Kawai Kaela",
     "price" : 800000,
-    "userId" : 1,
     "createdAt" : "2023-01-01T00:00:00.000Z",
     "updatedAt" : "2023-01-01T00:00:00.000Z"
   }
@@ -37,16 +36,7 @@ Response Body (Failed) :
 
 ```json
 {
-  "errors" : [
-    {
-      "field" : "name",
-      "message" : "Name must not be blank"
-    },
-    {
-      "field" : "price",
-      "message" : "Price must be a positive number"
-    }
-  ]
+  "errors" : "Validation error message"
 }
 ```
 
@@ -54,29 +44,24 @@ Response Body (Failed) :
 
 Endpoint : GET /api/items?page=1&limit=10
 
-Request Header :
-- Authorization : Bearer token
-
 Response Body (Success) :
 
 ```json
 {
   "data" : [
     {
-      "id" : 1,
+      "uuid" : "550e8400-e29b-41d4-a716-446655440000",
       "name" : "Figure",
       "description" : "Figure Kawai Kaela",
       "price" : 800000,
-      "userId" : 1,
       "createdAt" : "2023-01-01T00:00:00.000Z",
       "updatedAt" : "2023-01-01T00:00:00.000Z"
     },
     {
-      "id" : 2,
+      "uuid" : "550e8400-e29b-41d4-a716-446655440001",
       "name" : "Figure",
       "description" : "Figure Kawai Elaine",
       "price" : 700000,
-      "userId" : 1,
       "createdAt" : "2023-01-02T00:00:00.000Z",
       "updatedAt" : "2023-01-02T00:00:00.000Z"
     }
@@ -94,19 +79,15 @@ Response Body (Success) :
 
 Endpoint : GET /api/items/{id}
 
-Request Header :
-- Authorization : Bearer token
-
 Response Body (Success) :
 
 ```json
 {
   "data" : {
-    "id" : 1,
+    "uuid" : "550e8400-e29b-41d4-a716-446655440000",
     "name" : "Figure",
     "description" : "Figure Kawai Kaela",
     "price" : 800000,
-    "userId" : 1,
     "createdAt" : "2023-01-01T00:00:00.000Z",
     "updatedAt" : "2023-01-01T00:00:00.000Z"
   }
@@ -125,24 +106,15 @@ Response Body (Not Found) :
 
 Endpoint : GET /api/items/{id}/detail
 
-Request Header :
-- Authorization : Bearer token
-
 Response Body (Success) :
 
 ```json
 {
   "data" : {
-    "id" : 1,
+    "id" : "550e8400-e29b-41d4-a716-446655440000",
     "name" : "Figure",
     "description" : "Figure Kawai Kaela",
     "price" : 800000,
-    "user" : {
-      "id" : 1,
-      "username" : "johndoe",
-      "name" : "John Doe",
-      "role" : "user"
-    },
     "createdAt" : "2023-01-01T00:00:00.000Z",
     "updatedAt" : "2023-01-01T00:00:00.000Z"
   }
@@ -179,11 +151,10 @@ Response Body (Success) :
 ```json
 {
   "data" : {
-    "id" : 1,
+    "uuid" : "550e8400-e29b-41d4-a716-446655440000",
     "name" : "Updated Figure Name",
     "description" : "Updated description",
     "price" : 850000,
-    "userId" : 1,
     "createdAt" : "2023-01-01T00:00:00.000Z",
     "updatedAt" : "2023-01-03T00:00:00.000Z"
   }
@@ -194,12 +165,7 @@ Response Body (Failed) :
 
 ```json
 {
-  "errors" : [
-    {
-      "field" : "price",
-      "message" : "Price must be a positive number"
-    }
-  ]
+  "errors" : "Validation error message"
 }
 ```
 
