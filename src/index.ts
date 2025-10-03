@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { UserController } from './controller/user-controller'
-import { ItemController } from './controller/item-controller'
+import { ProductController } from './controller/product-controller'
+import { VariantController } from './controller/variant-controller'
 import { authMiddleware } from './middleware/auth-middleware'
 import { Scalar } from '@scalar/hono-api-reference'
 import { openApiSpec } from './openapi'
@@ -27,22 +28,30 @@ app.get('/docs', Scalar({
 
 app.route('/', UserController)
 
-// Apply auth to item routes, but make all GET requests exceptions
-app.use('/api/items', (c, next) => {
-  if (c.req.method !== 'GET') {
+// Apply auth middleware to protected routes
+app.use('/api/products', (c, next) => {
+  if (c.req.method === 'POST') {
     return authMiddleware(c, next)
   }
   return next()
-})  // POST /api/items requires auth, GET doesn't
-app.use('/api/items/:id', (c, next) => {
-  if (c.req.method !== 'GET') {
-    return authMiddleware(c, next)
-  }
-  return next()
-})  // PATCH, DELETE /api/items/:id require auth, GET doesn't
-// GET /api/items/:id/detail doesn't require auth (no middleware applied)
+})  // POST requires auth, GET doesn't
 
-app.route('/', ItemController)
+app.use('/api/products/:uuid', (c, next) => {
+  if (c.req.method !== 'GET') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // PATCH, DELETE require auth, GET doesn't
+
+app.use('/api/variants/:uuid', (c, next) => {
+  if (c.req.method !== 'GET') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // PATCH requires auth, GET doesn't
+
+app.route('/', ProductController)
+app.route('/', VariantController)
 
 app.onError(async (err, c) => {
   if (err instanceof HTTPException) {

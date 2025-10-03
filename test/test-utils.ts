@@ -33,31 +33,116 @@ export class UserTest {
     }
 }
 
-export class ItemTest {
+export class ProductTest {
     static async create() {
-        await prismaClient.item.create({
+        await prismaClient.product.create({
             data: {
-                name: "Test Item",
+                title: "Test Product",
                 description: "Test Description",
-                price: 100000,
+                product_type: "Collectible",
+                vendor: "Test Vendor",
+                tags: ["test", "product"],
+                status: "active",
+                published_at: new Date(),
+                variants: {
+                    create: {
+                        title: "Test Variant",
+                        price: 100000,
+                        sku: "TEST-001",
+                        inventory_quantity: 50,
+                        inventory_policy: "deny",
+                        option1: "Standard",
+                        inventory_item: {
+                            create: {
+                                sku: "TEST-001",
+                                tracked: true,
+                                available: 50,
+                                cost: 50000
+                            }
+                        }
+                    }
+                }
+            },
+            include: {
+                variants: true
             }
         })
     }
 
     static async delete() {
-        await prismaClient.item.deleteMany({
+        await prismaClient.product.deleteMany({
             where: {
-                name: {
-                    in: ["Test Item", "Figure", "Updated Item"]
+                title: {
+                    in: ["Test Product", "Figure", "Updated Product"]
                 }
             }
         })
     }
 
-    static async findByName(name: string) {
-        return await prismaClient.item.findFirst({
+    static async findByTitle(title: string) {
+        return await prismaClient.product.findFirst({
             where: {
-                name: name
+                title: title
+            },
+            include: {
+                variants: true
+            }
+        })
+    }
+}
+
+export class VariantTest {
+    static async create() {
+        const product = await prismaClient.product.create({
+            data: {
+                title: "Test Product for Variant",
+                description: "Test Description",
+                product_type: "Collectible",
+                vendor: "Test Vendor",
+                tags: ["test", "product"],
+                status: "active",
+                published_at: new Date(),
+                variants: {
+                    create: {
+                        title: "Test Variant",
+                        price: 100000,
+                        sku: "TEST-VARIANT-001",
+                        inventory_quantity: 50,
+                        inventory_policy: "deny",
+                        option1: "Standard",
+                        inventory_item: {
+                            create: {
+                                sku: "TEST-VARIANT-001",
+                                tracked: true,
+                                available: 50,
+                                cost: 50000
+                            }
+                        }
+                    }
+                }
+            },
+            include: {
+                variants: true
+            }
+        })
+        return product.variants[0]
+    }
+
+    static async delete() {
+        await prismaClient.product.deleteMany({
+            where: {
+                title: "Test Product for Variant"
+            }
+        })
+    }
+
+    static async findBySku(sku: string) {
+        return await prismaClient.variant.findFirst({
+            where: {
+                sku: sku
+            },
+            include: {
+                inventory_item: true
             }
         })
     }

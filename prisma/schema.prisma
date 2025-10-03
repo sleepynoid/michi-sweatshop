@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  uuid        Int      @id @default(autoincrement())
+  uuid        String   @id @default(cuid())
   username  String   @unique
   password  String
   name      String
@@ -26,13 +26,43 @@ model User {
   // items     Item[]
 }
 
-model Item {
-  uuid          String   @id @default(cuid())
-  name        String
-  description String
-  price       Int
-  // userId      Int
-  // user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Product {
+  uuid          String     @id @default(cuid())
+  title         String
+  description   String
+  product_type  String
+  vendor        String
+  tags          Json
+  status        String
+  published_at  DateTime?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  variants      Variant[]
+}
+
+model Variant {
+  uuid                String         @id @default(cuid())
+  title               String
+  price               Int
+  sku                 String         @unique
+  inventory_quantity  Int
+  inventory_policy    String
+  option1             String
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  productId           String
+  product             Product        @relation(fields: [productId], references: [uuid], onDelete: Cascade)
+  inventory_item      InventoryItem?
+}
+
+model InventoryItem {
+  uuid        String   @id @default(cuid())
+  sku         String
+  tracked     Boolean
+  available   Int
+  cost        Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  variantId   String   @unique
+  variant     Variant  @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
 }
