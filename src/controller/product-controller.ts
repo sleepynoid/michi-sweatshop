@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { CreateImageRequest } from "../model/image-model";
 import { ProductService } from "../service/product-service";
+import { HTTPException } from "hono/http-exception";
 // import { authMiddleware } from "../middleware/auth-middleware";
 
 export const ProductController = new Hono()
@@ -75,4 +76,41 @@ ProductController.post('/api/products/:uuid/images', async (c) => {
     return c.json({
         data: response
     })
+})
+
+ProductController.post('/api/products/:uuid/images/upload', async (c) => {
+    const productId = c.req.param('uuid')
+
+    // Parse FormData
+    const formData = await c.req.formData()
+    const file = formData.get('image') as File
+    const altText = formData.get('alt_text') as string
+    const position = formData.get('position') as string
+
+    if (!file) {
+        throw new HTTPException(400, { message: 'No file uploaded' })
+    }
+
+    // Validasi file
+    if (!file.type.startsWith('image/')) {
+        throw new HTTPException(400, { message: 'File must be an image' })
+    }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+        throw new HTTPException(400, { message: 'File too large (max 2MB)' })
+    }
+
+    // Convert ke buffer
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    // Upload via service
+    const response = await ProductService.uploadImageFile(productId, {
+        buffer,
+        filename: file.name,
+        mimeType: file.type,
+        altText,
+        position: position ? parseInt(position) : undefined
+    })
+
+    return c.json({ data: response })
 })

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { serveStatic } from 'hono/bun'
 import { UserController } from './controller/user-controller'
 import { ProductController } from './controller/product-controller'
 import { VariantController } from './controller/variant-controller'
@@ -50,6 +51,13 @@ app.use('/api/products/:uuid/images', (c, next) => {
   return next()
 })  // POST requires auth
 
+app.use('/api/products/:uuid/images/upload', (c, next) => {
+  if (c.req.method === 'POST') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // POST requires auth
+
 app.use('/api/variants', (c, next) => {
   if (c.req.method === 'POST') {
     return authMiddleware(c, next)
@@ -63,6 +71,9 @@ app.use('/api/variants/:uuid', (c, next) => {
   }
   return next()
 })  // PATCH, DELETE require auth, GET doesn't
+
+// Serve uploaded images
+app.use('/uploads/*', serveStatic({ root: './' }))
 
 app.route('/', ProductController)
 app.route('/', VariantController)
@@ -89,4 +100,7 @@ app.onError(async (err, c) => {
   }
 })
 
-export default app
+export default {
+  port: 8888,
+  fetch: app.fetch
+}

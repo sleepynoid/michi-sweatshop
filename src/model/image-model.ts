@@ -7,6 +7,12 @@ export interface Image {
   updated_at: Date;
   productId: string | null;
   variantId: string | null;
+  // File metadata
+  filename?: string | null;
+  size?: number | null;
+  mime_type?: string | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 export interface CreateImageRequest {

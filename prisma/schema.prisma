@@ -78,6 +78,12 @@ model Image {
   updated_at  DateTime @updatedAt
   productId   String?
   variantId   String?
+  // File metadata
+  filename    String?
+  size        Int?
+  mime_type   String?
+  width       Int?
+  height      Int?
   product     Product? @relation(fields: [productId], references: [uuid], onDelete: Cascade)
   variant     Variant? @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
 

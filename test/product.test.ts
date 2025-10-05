@@ -472,4 +472,122 @@ describe('POST /api/products/:uuid/images', () => {
         expect(response.status).toBe(401)
         expect(body.errors).toBeDefined()
     })
+
+    it('should upload image file successfully', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // Create FormData
+        const formData = new FormData()
+
+        // Create test file
+        const testImageBuffer = Buffer.from('fake image content for testing')
+        const testFile = new File([testImageBuffer], 'test.jpg', { type: 'image/jpeg' })
+
+        formData.append('image', testFile)
+        formData.append('alt_text', 'Test Image')
+        formData.append('position', '0')
+
+        const response = await app.request(`/api/products/${product!.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(200)
+        expect(body.data).toBeDefined()
+        expect(body.data.url).toContain('/uploads/products/')
+        expect(body.data.filename).toBeDefined()
+        expect(body.data.size).toBeGreaterThan(0)
+        expect(body.data.mime_type).toBe('image/jpeg')
+    })
+
+    it('should reject upload file if not an image', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // Create FormData with non-image file
+        const formData = new FormData()
+        const testFile = new File(['test text content'], 'test.txt', { type: 'text/plain' })
+
+        formData.append('image', testFile)
+
+        const response = await app.request(`/api/products/${product!.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(400)
+        expect(body.errors).toBeDefined()
+    })
+
+    it('should reject upload file if no file provided', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // Create FormData without file
+        const formData = new FormData()
+        formData.append('alt_text', 'Test Image')
+
+        const response = await app.request(`/api/products/${product!.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(400)
+        expect(body.errors).toBeDefined()
+    })
 })

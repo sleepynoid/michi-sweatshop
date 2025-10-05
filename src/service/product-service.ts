@@ -5,6 +5,9 @@ import { CreateInventoryItemRequest, UpdateInventoryItemRequest } from "../model
 import { CreateImageRequest, Image } from "../model/image-model";
 import { ProductValidation } from "../validation/product-validation";
 import { HTTPException } from "hono/http-exception";
+import { promises as fs } from "fs";
+import { randomUUID } from "crypto";
+import path = require("path");
 
 export class ProductService {
     static async create(request: CreateProductRequest): Promise<ProductResponse> {
@@ -394,6 +397,73 @@ export class ProductService {
             updated_at: image.updated_at,
             productId: image.productId,
             variantId: image.variantId
+        };
+    }
+
+    static async uploadImageFile(
+        productId: string,
+        request: {
+            buffer: Buffer;
+            filename: string;
+            mimeType: string;
+            altText?: string;
+            position?: number;
+        }
+    ): Promise<Image> {
+        // Validate product exists
+        const product = await prismaClient.product.findFirst({
+            where: { uuid: productId }
+        });
+        if (!product) {
+            throw new HTTPException(404, { message: "Product not found" });
+        }
+
+        // Generate unique filename
+        const fileExtension = path.extname(request.filename);
+        const uniqueFilename = `${randomUUID()}${fileExtension}`;
+
+        // Ensure upload directory exists
+        const uploadDir = process.env.UPLOAD_DIR || './uploads';
+        const productDir = path.join(uploadDir, 'products', productId);
+        await fs.mkdir(productDir, { recursive: true });
+
+        // Save file
+        const filePath = path.join(productDir, uniqueFilename);
+        await fs.writeFile(filePath, request.buffer);
+
+        // Get file stats
+        const stats = await fs.stat(filePath);
+
+        // Calculate position
+        const existingImagesCount = await prismaClient.image.count({
+            where: { productId }
+        });
+
+        // Save to database
+        const image = await prismaClient.image.create({
+            data: {
+                url: `/uploads/products/${productId}/${uniqueFilename}`,
+                alt_text: request.altText,
+                position: request.position ?? existingImagesCount,
+                productId,
+                filename: uniqueFilename,
+                size: stats.size,
+                mime_type: request.mimeType
+            }
+        });
+
+        return {
+            uuid: image.uuid,
+            url: image.url,
+            alt_text: image.alt_text,
+            position: image.position,
+            created_at: image.created_at,
+            updated_at: image.updated_at,
+            productId: image.productId,
+            variantId: image.variantId,
+            filename: image.filename || uniqueFilename,
+            size: image.size || stats.size,
+            mime_type: image.mime_type || request.mimeType
         };
     }
 }

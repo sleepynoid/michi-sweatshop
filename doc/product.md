@@ -12,7 +12,6 @@ Request Body:
 ```json
 {
   "title": "Figure",
-  "handle": "figure-kaela",
   "description": "Figure Kawai Kaela",
   "product_type": "Collectible",
   "vendor": "Kawai",
@@ -43,7 +42,6 @@ Response Body (Success):
   "data": {
     "uuid": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Figure",
-    "handle": "figure-kaela",
     "description": "Figure Kawai Kaela",
     "product_type": "Collectible",
     "vendor": "Kawai",
@@ -98,7 +96,6 @@ Response Body (Success):
     {
       "uuid": "550e8400-e29b-41d4-a716-446655440000",
       "title": "Figure",
-      "handle": "figure-kaela",
       "description": "Figure Kawai Kaela",
       "product_type": "Collectible",
       "vendor": "Kawai",
@@ -124,7 +121,6 @@ Response Body (Success):
     {
       "uuid": "550e8400-e29b-41d4-a716-446655440002",
       "title": "Figure",
-      "handle": "figure-elaine",
       "description": "Figure Kawai Elaine",
       "product_type": "Collectible",
       "vendor": "Kawai",
@@ -168,7 +164,6 @@ Response Body (Success):
   "data": {
     "uuid": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Figure",
-    "handle": "figure-kaela",
     "description": "Figure Kawai Kaela",
     "product_type": "Collectible",
     "vendor": "Kawai",
@@ -213,7 +208,6 @@ Response Body (Success):
   "data": {
     "uuid": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Figure",
-    "handle": "figure-kaela",
     "description": "Figure Kawai Kaela",
     "product_type": "Collectible",
     "vendor": "Kawai",
@@ -268,7 +262,6 @@ Request Body:
 ```json
 {
   "title": "Updated Figure",
-  "handle": "updated-figure-kaela",
   "description": "Updated Figure Kawai Kaela",
   "product_type": "Collectible",
   "vendor": "Kawai",
@@ -300,7 +293,6 @@ Response Body (Success):
   "data": {
     "uuid": "550e8400-e29b-41d4-a716-446655440000",
     "title": "Updated Figure",
-    "handle": "updated-figure-kaela",
     "description": "Updated Figure Kawai Kaela",
     "product_type": "Collectible",
     "vendor": "Kawai",
@@ -361,3 +353,186 @@ Response Body (Not Found):
   "errors": "Product not found"
 }
 ```
+
+## Upload Product Image
+
+Endpoint: POST /api/products/{uuid}/images/upload
+
+Request Header:
+- Authorization: Bearer token
+- Content-Type: multipart/form-data
+
+Request Body (Form Data):
+- image: File (required) - Image file (JPEG, PNG, GIF, WebP)
+- alt_text: String (optional) - Alternative text for the image
+- position: Number (optional) - Display position of the image (auto-assigned if not provided)
+
+Response Body (Success):
+
+```json
+{
+  "data": {
+    "uuid": "550e8400-e29b-41d4-a716-446655440004",
+    "url": "/uploads/products/550e8400-e29b-41d4-a716-446655440000/unique-filename.jpg",
+    "alt_text": "Product main image",
+    "position": 0,
+    "filename": "unique-filename.jpg",
+    "size": 245760,
+    "mime_type": "image/jpeg",
+    "created_at": "2025-10-05T14:00:00.000Z",
+    "updated_at": "2025-10-05T14:00:00.000Z",
+    "productId": "550e8400-e29b-41d4-a716-446655440000",
+    "variantId": null
+  }
+}
+```
+
+Response Body (Validation Failed):
+
+```json
+{
+  "errors": "File must be an image"
+}
+```
+
+Response Body (File Too Large):
+
+```json
+{
+  "errors": "File too large (max 2MB)"
+}
+```
+
+Response Body (No File Uploaded):
+
+```json
+{
+  "errors": "No file uploaded"
+}
+```
+
+Response Body (Product Not Found):
+
+```json
+{
+  "errors": "Product not found"
+}
+```
+
+Response Body (Unauthorized):
+
+```json
+{
+  "errors": "Unauthorized"
+}
+```
+
+### File Upload Specifications:
+- **Supported Formats**: JPEG, PNG, GIF, WebP, and other image formats
+- **Maximum File Size**: 2MB
+- **Storage Location**: `./uploads/products/{productId}/`
+- **File Naming**: UUID-based unique filename to prevent conflicts
+- **Access**: Public access via `/uploads/*` static route
+
+### Example Usage (cURL):
+
+```bash
+curl -X POST "http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000/images/upload" \
+  -H "Authorization: Bearer your-jwt-token" \
+  -F "image=@/path/to/image.jpg" \
+  -F "alt_text=Product main image" \
+  -F "position=0"
+```
+
+### Example Usage (JavaScript/Fetch):
+
+```javascript
+const formData = new FormData();
+formData.append('image', imageFile);
+formData.append('alt_text', 'Product main image');
+formData.append('position', '0');
+
+const response = await fetch('/api/products/{productId}/images/upload', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  },
+  body: formData
+});
+
+const result = await response.json();
+```
+
+## Upload Product Image (URL-based)
+
+Endpoint: POST /api/products/{uuid}/images
+
+Request Header:
+- Authorization: Bearer token
+- Content-Type: application/json
+
+Request Body:
+
+```json
+{
+  "url": "https://example.com/images/product-image.jpg",
+  "alt_text": "Product image description",
+  "position": 0
+}
+```
+
+Response Body (Success):
+
+```json
+{
+  "data": {
+    "uuid": "550e8400-e29b-41d4-a716-446655440005",
+    "url": "https://example.com/images/product-image.jpg",
+    "alt_text": "Product image description",
+    "position": 0,
+    "created_at": "2025-10-05T14:00:00.000Z",
+    "updated_at": "2025-10-05T14:00:00.000Z",
+    "productId": "550e8400-e29b-41d4-a716-446655440000",
+    "variantId": null
+  }
+}
+```
+
+Response Body (Failed):
+
+```json
+{
+  "errors": [
+    {
+      "field": "url",
+      "message": "URL must not be blank"
+    }
+  ]
+}
+```
+
+## Access Uploaded Images
+
+Uploaded images are accessible via public URLs:
+
+```
+http://localhost:3000/uploads/products/{productId}/{filename}
+```
+
+### Example:
+```
+http://localhost:3000/uploads/products/550e8400-e29b-41d4-a716-446655440000/unique-filename.jpg
+```
+
+### Image Metadata Fields:
+- **uuid**: Unique identifier for the image record
+- **url**: Full URL path to access the image
+- **alt_text**: Alternative text for accessibility
+- **position**: Display order (0-based indexing)
+- **filename**: Original filename stored on disk
+- **size**: File size in bytes
+- **mime_type**: MIME type of the image file
+- **created_at**: Image upload timestamp
+- **updated_at**: Last modification timestamp
+- **productId**: Associated product UUID
+- **variantId**: Associated variant UUID (null for product images)

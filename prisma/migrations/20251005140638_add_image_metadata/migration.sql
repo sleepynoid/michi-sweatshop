@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `Image` ADD COLUMN `filename` VARCHAR(191) NULL,
+    ADD COLUMN `height` INTEGER NULL,
+    ADD COLUMN `mime_type` VARCHAR(191) NULL,
+    ADD COLUMN `size` INTEGER NULL,
+    ADD COLUMN `width` INTEGER NULL;
