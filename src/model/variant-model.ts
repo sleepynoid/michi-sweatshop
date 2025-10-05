@@ -1,4 +1,5 @@
 import { InventoryItem } from "./inventory-item-model";
+import { Image } from "./image-model";
 
 export interface Variant {
   uuid: string;
@@ -10,10 +11,12 @@ export interface Variant {
   option1: string;
   created_at: Date;
   updated_at: Date;
+  images?: Image[];
   inventory_item?: InventoryItem;
 }
 
 export interface CreateVariantRequest {
+  productId?: string;
   title: string;
   price: number;
   sku: string;

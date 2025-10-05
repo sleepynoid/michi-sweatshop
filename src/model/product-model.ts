@@ -1,4 +1,5 @@
-import { Variant } from "./variant-model";
+import { CreateVariantRequest, UpdateVariantRequest, Variant } from "./variant-model";
+import { Image, CreateImageRequest } from "./image-model";
 
 export interface Product {
   uuid: string;
@@ -12,6 +13,7 @@ export interface Product {
   created_at: Date;
   updated_at: Date;
   variants: Variant[];
+  images: Image[];
 }
 
 export interface CreateProductRequest {
@@ -21,7 +23,8 @@ export interface CreateProductRequest {
   vendor: string;
   tags: string[];
   status: string;
-  variants: import("./variant-model").CreateVariantRequest[];
+  variants: CreateVariantRequest[];
+  images?: CreateImageRequest[];
 }
 
 export interface UpdateProductRequest {
@@ -31,7 +34,7 @@ export interface UpdateProductRequest {
   vendor?: string;
   tags?: string[];
   status?: string;
-  variants?: import("./variant-model").UpdateVariantRequest[];
+  variants?: UpdateVariantRequest[];
 }
 
 export interface ProductResponse {
@@ -45,6 +48,7 @@ export interface ProductResponse {
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  images: Image[];
   variants: Variant[];
 }
 
@@ -69,6 +73,7 @@ export interface ProductDetailResponse {
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  images: Image[];
   variants: Variant[];
 }
 

@@ -43,12 +43,26 @@ app.use('/api/products/:uuid', (c, next) => {
   return next()
 })  // PATCH, DELETE require auth, GET doesn't
 
+app.use('/api/products/:uuid/images', (c, next) => {
+  if (c.req.method === 'POST') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // POST requires auth
+
+app.use('/api/variants', (c, next) => {
+  if (c.req.method === 'POST') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // POST requires auth
+
 app.use('/api/variants/:uuid', (c, next) => {
   if (c.req.method !== 'GET') {
     return authMiddleware(c, next)
   }
   return next()
-})  // PATCH requires auth, GET doesn't
+})  // PATCH, DELETE require auth, GET doesn't
 
 app.route('/', ProductController)
 app.route('/', VariantController)

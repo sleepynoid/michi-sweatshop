@@ -1,8 +1,18 @@
 import { Hono } from "hono";
-import { UpdateVariantRequest } from "../model/variant-model";
+import { CreateVariantRequest, UpdateVariantRequest } from "../model/variant-model";
 import { VariantService } from "../service/variant-service";
 
 export const VariantController = new Hono()
+
+VariantController.post('/api/variants', async (c) => {
+    const request = await c.req.json() as CreateVariantRequest
+
+    const response = await VariantService.create(request)
+
+    return c.json({
+        data: response
+    })
+})
 
 VariantController.get('/api/variants/:uuid', async (c) => {
     const variantId = c.req.param('uuid')

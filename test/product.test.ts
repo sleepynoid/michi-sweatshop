@@ -318,3 +318,158 @@ describe('DELETE /api/products/:uuid', () => {
         expect(body.data).toBe(true)
     })
 })
+
+describe('POST /api/products/:uuid/images', () => {
+    afterEach(async () => {
+        await ProductTest.delete()
+        await UserTest.delete()
+    })
+
+    it('should upload image successfully', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        const response = await app.request(`/api/products/${product!.uuid}/images`, {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: "https://example.com/image1.jpg",
+                alt_text: "Product Image 1",
+                position: 0
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(200)
+        expect(body.data).toBeDefined()
+        expect(body.data.url).toBe("https://example.com/image1.jpg")
+        expect(body.data.alt_text).toBe("Product Image 1")
+        expect(body.data.position).toBe(0)
+        expect(body.data.productId).toBe(product!.uuid)
+    })
+
+    it('should upload image with auto position successfully', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // Upload first image
+        await app.request(`/api/products/${product!.uuid}/images`, {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: "https://example.com/image1.jpg",
+                alt_text: "Product Image 1"
+            })
+        })
+
+        // Upload second image without position (should auto-assign position 1)
+        const response = await app.request(`/api/products/${product!.uuid}/images`, {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: "https://example.com/image2.jpg",
+                alt_text: "Product Image 2"
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(200)
+        expect(body.data).toBeDefined()
+        expect(body.data.url).toBe("https://example.com/image2.jpg")
+        expect(body.data.alt_text).toBe("Product Image 2")
+        expect(body.data.position).toBe(1)
+        expect(body.data.productId).toBe(product!.uuid)
+    })
+
+    it('should reject upload image if product not found', async () => {
+        await UserTest.create()
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                username: 'test',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        const response = await app.request('/api/products/invalid-uuid/images', {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: "https://example.com/image1.jpg",
+                alt_text: "Product Image 1"
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(404)
+        expect(body.errors).toBeDefined()
+    })
+
+    it('should reject upload image if unauthorized', async () => {
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const response = await app.request(`/api/products/${product!.uuid}/images`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: "https://example.com/image1.jpg",
+                alt_text: "Product Image 1"
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(401)
+        expect(body.errors).toBeDefined()
+    })
+})

@@ -37,6 +37,7 @@ model Product {
   published_at  DateTime?
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
+  images        Image[]
   variants      Variant[]
 }
 
@@ -53,6 +54,7 @@ model Variant {
   productId           String
   product             Product        @relation(fields: [productId], references: [uuid], onDelete: Cascade)
   inventory_item      InventoryItem?
+  images              Image[]
 }
 
 model InventoryItem {
@@ -65,4 +67,20 @@ model InventoryItem {
   updated_at  DateTime @updatedAt
   variantId   String   @unique
   variant     Variant  @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
+}
+
+model Image {
+  uuid        String   @id @default(cuid())
+  url         String
+  alt_text    String?
+  position    Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  productId   String?
+  variantId   String?
+  product     Product? @relation(fields: [productId], references: [uuid], onDelete: Cascade)
+  variant     Variant? @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
+
+  @@unique([productId, position])
+  @@unique([variantId, position])
 }

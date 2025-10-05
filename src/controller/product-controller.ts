@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
+import { CreateImageRequest } from "../model/image-model";
 import { ProductService } from "../service/product-service";
 // import { authMiddleware } from "../middleware/auth-middleware";
 
@@ -59,6 +60,17 @@ ProductController.delete('/api/products/:uuid', async (c) => {
     const productId = c.req.param('uuid')
 
     const response = await ProductService.delete(productId)
+
+    return c.json({
+        data: response
+    })
+})
+
+ProductController.post('/api/products/:uuid/images', async (c) => {
+    const productId = c.req.param('uuid')
+    const request = await c.req.json() as CreateImageRequest
+
+    const response = await ProductService.uploadImage(productId, request)
 
     return c.json({
         data: response

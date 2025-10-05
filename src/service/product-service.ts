@@ -2,6 +2,7 @@ import { prismaClient } from "../Application/database";
 import { CreateProductRequest, ProductDetailResponse, ProductResponse, PaginatedProductsResponse, UpdateProductRequest } from "../model/product-model";
 import { CreateVariantRequest, UpdateVariantRequest } from "../model/variant-model";
 import { CreateInventoryItemRequest, UpdateInventoryItemRequest } from "../model/inventory-item-model";
+import { CreateImageRequest, Image } from "../model/image-model";
 import { ProductValidation } from "../validation/product-validation";
 import { HTTPException } from "hono/http-exception";
 
@@ -35,14 +36,22 @@ export class ProductService {
                             }
                         }
                     }))
-                }
+                },
+                images: request.images ? {
+                    create: request.images.map((image, index) => ({
+                        url: image.url,
+                        alt_text: image.alt_text,
+                        position: image.position ?? index
+                    }))
+                } : undefined
             },
             include: {
                 variants: {
                     include: {
                         inventory_item: true
                     }
-                }
+                },
+                images: true
             }
         });
 
@@ -57,6 +66,7 @@ export class ProductService {
             published_at: product.published_at,
             created_at: product.created_at,
             updated_at: product.updated_at,
+            images: product.images,
             variants: product.variants.map(variant => ({
                 uuid: variant.uuid,
                 title: variant.title,
@@ -80,7 +90,8 @@ export class ProductService {
                 take: limit,
                 orderBy: { created_at: 'desc' },
                 include: {
-                    variants: true
+                    variants: true,
+                    images: true
                 }
             }),
             prismaClient.product.count()
@@ -100,6 +111,7 @@ export class ProductService {
                 published_at: product.published_at,
                 created_at: product.created_at,
                 updated_at: product.updated_at,
+                images: product.images,
                 variants: product.variants.map(variant => ({
                     uuid: variant.uuid,
                     title: variant.title,
@@ -127,7 +139,8 @@ export class ProductService {
                 uuid: productId
             },
             include: {
-                variants: true
+                variants: true,
+                images: true
             }
         });
 
@@ -146,6 +159,7 @@ export class ProductService {
             published_at: product.published_at,
             created_at: product.created_at,
             updated_at: product.updated_at,
+            images: product.images,
             variants: product.variants.map(variant => ({
                 uuid: variant.uuid,
                 title: variant.title,
@@ -170,7 +184,8 @@ export class ProductService {
                     include: {
                         inventory_item: true
                     }
-                }
+                },
+                images: true
             }
         });
 
@@ -189,6 +204,7 @@ export class ProductService {
             published_at: product.published_at,
             created_at: product.created_at,
             updated_at: product.updated_at,
+            images: product.images,
             variants: product.variants.map(variant => ({
                 uuid: variant.uuid,
                 title: variant.title,
@@ -248,7 +264,8 @@ export class ProductService {
                     include: {
                         inventory_item: true
                     }
-                }
+                },
+                images: true
             }
         });
 
@@ -284,11 +301,12 @@ export class ProductService {
             }
         }
 
-        // Refetch updated product
+        // Refetch updated product with images
         const finalProduct = await prismaClient.product.findFirst({
             where: { uuid: productId },
             include: {
-                variants: true
+                variants: true,
+                images: true
             }
         });
 
@@ -307,6 +325,7 @@ export class ProductService {
             published_at: finalProduct.published_at,
             created_at: finalProduct.created_at,
             updated_at: finalProduct.updated_at,
+            images: finalProduct.images,
             variants: finalProduct.variants.map(variant => ({
                 uuid: variant.uuid,
                 title: variant.title,
@@ -337,5 +356,44 @@ export class ProductService {
         });
 
         return true;
+    }
+
+    static async uploadImage(productId: string, request: CreateImageRequest): Promise<Image> {
+        const product = await prismaClient.product.findFirst({
+            where: {
+                uuid: productId
+            }
+        });
+
+        if (!product) {
+            throw new HTTPException(404, { message: "Product not found" });
+        }
+
+        // Get the next position for the image
+        const existingImagesCount = await prismaClient.image.count({
+            where: {
+                productId: productId
+            }
+        });
+
+        const image = await prismaClient.image.create({
+            data: {
+                url: request.url,
+                alt_text: request.alt_text,
+                position: request.position ?? existingImagesCount,
+                productId: productId
+            }
+        });
+
+        return {
+            uuid: image.uuid,
+            url: image.url,
+            alt_text: image.alt_text,
+            position: image.position,
+            created_at: image.created_at,
+            updated_at: image.updated_at,
+            productId: image.productId,
+            variantId: image.variantId
+        };
     }
 }
