@@ -100,7 +100,4 @@ app.onError(async (err, c) => {
   }
 })
 
-export default {
-  port: 8888,
-  fetch: app.fetch
-}
+export default app

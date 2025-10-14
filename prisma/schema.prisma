@@ -10,12 +10,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  uuid        String   @id @default(cuid())
+  uuid        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username  String   @unique
   password  String
   name      String
@@ -27,7 +27,7 @@ model User {
 }
 
 model Product {
-  uuid          String     @id @default(cuid())
+  uuid          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title         String
   description   String
   product_type  String
@@ -42,7 +42,7 @@ model Product {
 }
 
 model Variant {
-  uuid                String         @id @default(cuid())
+  uuid                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title               String
   price               Int
   sku                 String         @unique
@@ -51,33 +51,33 @@ model Variant {
   option1             String
   created_at          DateTime       @default(now())
   updated_at          DateTime       @updatedAt
-  productId           String
+  productId           String         @db.Uuid
   product             Product        @relation(fields: [productId], references: [uuid], onDelete: Cascade)
   inventory_item      InventoryItem?
   images              Image[]
 }
 
 model InventoryItem {
-  uuid        String   @id @default(cuid())
+  uuid        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   sku         String
   tracked     Boolean
   available   Int
   cost        Int
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  variantId   String   @unique
+  variantId   String   @unique @db.Uuid
   variant     Variant  @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
 }
 
 model Image {
-  uuid        String   @id @default(cuid())
+  uuid        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   url         String
   alt_text    String?
   position    Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
-  productId   String?
-  variantId   String?
+  productId   String?  @db.Uuid
+  variantId   String?  @db.Uuid
   // File metadata
   filename    String?
   size        Int?

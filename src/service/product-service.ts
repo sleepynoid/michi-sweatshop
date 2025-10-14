@@ -8,6 +8,7 @@ import { HTTPException } from "hono/http-exception";
 import { promises as fs } from "fs";
 import { randomUUID } from "crypto";
 import path = require("path");
+import { validateUUID } from "../utils/uuid-validator";
 
 export class ProductService {
     static async create(request: CreateProductRequest): Promise<ProductResponse> {
@@ -137,6 +138,9 @@ export class ProductService {
     }
 
     static async getById(productId: string): Promise<ProductResponse> {
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
+
         const product = await prismaClient.product.findFirst({
             where: {
                 uuid: productId
@@ -178,6 +182,9 @@ export class ProductService {
     }
 
     static async getDetail(productId: string): Promise<ProductDetailResponse> {
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
+
         const product = await prismaClient.product.findFirst({
             where: {
                 uuid: productId
@@ -233,6 +240,9 @@ export class ProductService {
 
     static async update(productId: string, request: UpdateProductRequest): Promise<ProductResponse> {
         request = ProductValidation.UPDATE.parse(request);
+
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
 
         const product = await prismaClient.product.findFirst({
             where: {
@@ -344,6 +354,9 @@ export class ProductService {
     }
 
     static async delete(productId: string): Promise<boolean> {
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
+
         const product = await prismaClient.product.findFirst({
             where: {
                 uuid: productId
@@ -362,6 +375,9 @@ export class ProductService {
     }
 
     static async uploadImage(productId: string, request: CreateImageRequest): Promise<Image> {
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
+
         const product = await prismaClient.product.findFirst({
             where: {
                 uuid: productId
@@ -410,6 +426,9 @@ export class ProductService {
             position?: number;
         }
     ): Promise<Image> {
+        // Validate productId UUID format
+        validateUUID(productId, "Product");
+
         // Validate product exists
         const product = await prismaClient.product.findFirst({
             where: { uuid: productId }

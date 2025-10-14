@@ -1,12 +1,16 @@
 import { prismaClient } from "../Application/database";
 import { Variant, UpdateVariantRequest, CreateVariantRequest } from "../model/variant-model";
 import { HTTPException } from "hono/http-exception";
+import { validateUUID } from "../utils/uuid-validator";
 
 export class VariantService {
     static async create(request: CreateVariantRequest): Promise<Variant> {
         if (!request.productId) {
             throw new HTTPException(400, { message: "productId is required to create a variant" });
         }
+
+        // Validate productId UUID format
+        validateUUID(request.productId, "Product");
 
         // Check if product exists
         const product = await prismaClient.product.findFirst({
@@ -77,6 +81,9 @@ export class VariantService {
         };
     }
     static async update(variantId: string, request: UpdateVariantRequest): Promise<Variant> {
+        // Validate variantId UUID format
+        validateUUID(variantId, "Variant");
+
         const variant = await prismaClient.variant.findFirst({
             where: {
                 uuid: variantId
@@ -156,6 +163,9 @@ export class VariantService {
     }
 
     static async getById(variantId: string): Promise<Variant> {
+        // Validate variantId UUID format
+        validateUUID(variantId, "Variant");
+
         const variant = await prismaClient.variant.findFirst({
             where: {
                 uuid: variantId
