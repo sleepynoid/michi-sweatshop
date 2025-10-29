@@ -22,7 +22,7 @@ export class UserService {
         // hash pass pake bycrypt
         request.password = await Bun.password.hash(request.password, {
             algorithm: "bcrypt",
-            cost: 10
+            cost: 4
         })
         // save ke db
         const user = await prismaClient.user.create({

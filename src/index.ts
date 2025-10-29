@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/bun'
 import { UserController } from './controller/user-controller'
 import { ProductController } from './controller/product-controller'
@@ -11,6 +12,12 @@ import { ZodError } from 'zod'
 import { logger } from 'hono/logger'
 
 const app = new Hono()
+
+  app.use('/api/*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['*'],
+}))
 
 app.use(logger())
 app.get('/', (c) => {
@@ -99,5 +106,12 @@ app.onError(async (err, c) => {
     })
   }
 })
+
+
+// app.use('/api2/*', cors({
+//   origin: '*',
+//   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowHeaders: ['*'],
+// }))
 
 export default app
