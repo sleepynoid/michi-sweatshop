@@ -18,6 +18,8 @@ describe('POST /api/users', () => {
             },
             body: JSON.stringify({
                 username: "",
+                email: "",
+                phone: "",
                 password: "",
                 name: ""
             })
@@ -37,6 +39,8 @@ describe('POST /api/users', () => {
             method: 'post',
             body: JSON.stringify({
                 username: "test",
+                email: "test@example.com",
+                phone: "+628123456789",
                 name: "test",
                 password: "test123"
             })
@@ -54,6 +58,8 @@ describe('POST /api/users', () => {
             method: 'post',
             body: JSON.stringify({
                 username: "test",
+                email: "test@example.com",
+                phone: "+628123456789",
                 name: "test",
                 password: "test123"
             })
@@ -65,6 +71,8 @@ describe('POST /api/users', () => {
         expect(response.status).toBe(200)
         expect(body.data).toBeDefined()
         expect(body.data.username).toBe("test")
+        expect(body.data.email).toBe("test@example.com")
+        expect(body.data.phone).toBe("+628123456789")
         expect(body.data.name).toBe("test")
     })
 })
@@ -81,7 +89,7 @@ describe('POST /api/users/login' ,() => {
         const response = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -92,17 +100,19 @@ describe('POST /api/users/login' ,() => {
         expect(response.status).toBe(200)
         expect(body.data).toBeDefined()
         expect(body.data.username).toBe('test')
+        expect(body.data.email).toBe('test@example.com')
+        expect(body.data.phone).toBe('+628123456789')
         expect(body.data.name).toBe('test')
         expect(body.data.token).toBeDefined()
     })
 
-    it('should reject login for non-existing username ', async () => {
+    it('should reject login for non-existing email ', async () => {
         await UserTest.create()
 
         const response = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'paijo',
+                email: 'paijo@example.com',
                 password: 'test123'
             })
         })
@@ -120,7 +130,7 @@ describe('POST /api/users/login' ,() => {
         const response = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test12345'
             })
         })
@@ -130,5 +140,5 @@ describe('POST /api/users/login' ,() => {
 
         expect(response.status).toBe(401)
         expect(body.errors).toBeDefined()
-    }) 
+    })
 })

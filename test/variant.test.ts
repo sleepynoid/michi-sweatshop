@@ -20,7 +20,7 @@ describe('POST /api/variants', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -72,7 +72,7 @@ describe('POST /api/variants', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -118,7 +118,7 @@ describe('POST /api/variants', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -185,7 +185,7 @@ describe('POST /api/variants', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -313,7 +313,7 @@ describe('PATCH /api/variants/:uuid', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -355,7 +355,7 @@ describe('PATCH /api/variants/:uuid', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -392,7 +392,7 @@ describe('PATCH /api/variants/:uuid', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })

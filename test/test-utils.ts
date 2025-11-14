@@ -7,6 +7,8 @@ export class UserTest {
             update: {},
             create: {
                 username: "test",
+                email: "test@example.com",
+                phone: "+628123456789",
                 name: "test",
                 password: await Bun.password.hash("test123", {
                     algorithm: "bcrypt",

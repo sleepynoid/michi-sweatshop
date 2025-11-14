@@ -15,7 +15,7 @@ describe('POST /api/products', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -79,7 +79,7 @@ describe('POST /api/products', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -243,7 +243,7 @@ describe('PATCH /api/products/:uuid', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -296,7 +296,7 @@ describe('DELETE /api/products/:uuid', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -333,7 +333,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -373,7 +373,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -424,7 +424,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -481,7 +481,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -527,7 +527,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })
@@ -564,7 +564,7 @@ describe('POST /api/products/:uuid/images', () => {
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
-                username: 'test',
+                email: 'test@example.com',
                 password: 'test123'
             })
         })

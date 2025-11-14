@@ -9,14 +9,25 @@ export class UserService {
         // validasi dengan zod
         request = UserValidation.REGISTER.parse(request)
         // check db apakah duplikat
-        const duplicateUser = await prismaClient.user.count({
+        const duplicateUsername = await prismaClient.user.count({
             where: {
                 username: request.username
             }
         })
-        if (duplicateUser != 0) {
+        if (duplicateUsername != 0) {
             throw new HTTPException(400, {
                 message: "username already exist"
+            })
+        }
+
+        const duplicateEmail = await prismaClient.user.count({
+            where: {
+                email: request.email
+            }
+        })
+        if (duplicateEmail != 0) {
+            throw new HTTPException(400, {
+                message: "email already exist"
             })
         }
         // hash pass pake bycrypt
@@ -38,13 +49,13 @@ export class UserService {
 
         const isUserExist = await prismaClient.user.findUnique({
             where: {
-                username: request.username
+                email: request.email
             }
         })
 
         if (!isUserExist) {
             throw new HTTPException(401, {
-                message: "username or password wrong"
+                message: "email or password wrong"
             })
         }
 
@@ -52,7 +63,7 @@ export class UserService {
 
         if (!isPasswordValid) {
             throw new HTTPException(401, {
-                message: "username or password wrong"
+                message: "email or password wrong"
             })
         }
 
