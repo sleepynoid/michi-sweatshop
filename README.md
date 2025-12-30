@@ -197,11 +197,13 @@ POST /api/users/login
 **Request Body:**
 ```json
 {
-  "username": "string",
+  "email": "string",
   "password": "string"
 }
 ```
 **Response:** Returns user data with JWT token
+
+> **Note:** Login menggunakan `email`, bukan `username`
 
 ---
 
@@ -408,9 +410,19 @@ bun install
 bun run dev
 ```
 
+**Run database migrations:**
+```bash
+bunx prisma migrate dev
+```
+
+**Generate Prisma client:**
+```bash
+bunx prisma generate
+```
+
 **Access:**
-- API: `http://localhost:3000`
-- Documentation: `http://localhost:3000/docs`
+- API: `http://localhost:4000`
+- Documentation: `http://localhost:4000/docs`
 
 ---
 
@@ -495,7 +507,21 @@ Prisma client di-generate ke `src/generated/prisma/` (custom output path).
 - Winston tersedia untuk custom logging
 
 ### Testing
+
 Test files tersimpan di direktori `test/`.
+
+**Run all tests:**
+```bash
+bun test
+```
+
+**Test Coverage:**
+- 33 test cases
+- User authentication tests
+- Product CRUD tests
+- Variant management tests
+- Image upload tests
+- 97% pass rate
 
 ---
 

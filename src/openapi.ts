@@ -7,7 +7,7 @@ export const openApiSpec = {
   },
   servers: [
     {
-      url: 'http://localhost:3000',
+      url: 'http://localhost:4000',
       description: 'Development server'
     }
   ],
@@ -22,12 +22,14 @@ export const openApiSpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  username: { type: 'string' },
-                  password: { type: 'string' },
-                  name: { type: 'string' },
-                  role: { type: 'string' }
+                  username: { type: 'string', description: 'Username for the account' },
+                  email: { type: 'string', format: 'email', description: 'Email address' },
+                  phone: { type: 'string', description: 'Phone number' },
+                  password: { type: 'string', minLength: 6, description: 'Password (min 6 characters)' },
+                  name: { type: 'string', description: 'Full name' },
+                  role: { type: 'string', description: 'User role (default: user)' }
                 },
-                required: ['username', 'password', 'name']
+                required: ['username', 'email', 'phone', 'password', 'name']
               }
             }
           }
@@ -43,8 +45,9 @@ export const openApiSpec = {
                     data: {
                       type: 'object',
                       properties: {
-                        id: { type: 'number' },
                         username: { type: 'string' },
+                        email: { type: 'string' },
+                        phone: { type: 'string' },
                         name: { type: 'string' },
                         role: { type: 'string' }
                       }
@@ -89,10 +92,10 @@ export const openApiSpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  username: { type: 'string' },
-                  password: { type: 'string' }
+                  email: { type: 'string', format: 'email', description: 'Email address' },
+                  password: { type: 'string', description: 'Password' }
                 },
-                required: ['username', 'password']
+                required: ['email', 'password']
               }
             }
           }
@@ -108,11 +111,12 @@ export const openApiSpec = {
                     data: {
                       type: 'object',
                       properties: {
-                        id: { type: 'number' },
                         username: { type: 'string' },
+                        email: { type: 'string' },
+                        phone: { type: 'string' },
                         name: { type: 'string' },
                         role: { type: 'string' },
-                        token: { type: 'string' }
+                        token: { type: 'string', description: 'JWT authentication token' }
                       }
                     }
                   }

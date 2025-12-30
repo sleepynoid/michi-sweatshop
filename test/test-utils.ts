@@ -2,10 +2,19 @@ import { prismaClient } from "../src/Application/database";
 
 export class UserTest {
     static async create() {
-        await prismaClient.user.upsert({
-            where: { username: "test" },
-            update: {},
-            create: {
+        // Delete first to avoid unique constraint errors
+        await prismaClient.user.deleteMany({
+            where: {
+                OR: [
+                    { username: "test" },
+                    { email: "test@example.com" }
+                ]
+            }
+        })
+
+        // Then create fresh user
+        await prismaClient.user.create({
+            data: {
                 username: "test",
                 email: "test@example.com",
                 phone: "+628123456789",
