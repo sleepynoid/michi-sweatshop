@@ -6,20 +6,9 @@ import { HTTPException } from "hono/http-exception"
 
 export class UserService {
     static async register(request: RegisterUserRequest): Promise<UserResponse> {
-        // validasi dengan zod
         request = UserValidation.REGISTER.parse(request)
-        // check db apakah duplikat
-        const duplicateUsername = await prismaClient.user.count({
-            where: {
-                username: request.username
-            }
-        })
-        if (duplicateUsername != 0) {
-            throw new HTTPException(400, {
-                message: "username already exist"
-            })
-        }
 
+        // Check email duplicate
         const duplicateEmail = await prismaClient.user.count({
             where: {
                 email: request.email

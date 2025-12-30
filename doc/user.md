@@ -8,7 +8,6 @@ Request Body :
 
 ```json
 {
-  "username" : "khannedy",
   "email" : "khannedy@example.com",
   "phone" : "+628123456789",
   "password" : "rahasia",
@@ -21,8 +20,6 @@ Response Body (Success) :
 ```json
 {
   "data" : {
-    "id" : 1,
-    "username" : "khannedy",
     "email" : "khannedy@example.com",
     "phone" : "+628123456789",
     "name" : "Eko Kurniawan Khannedy",
@@ -36,10 +33,6 @@ Response Body (Failed) :
 ```json
 {
   "errors" : [
-    {
-      "field" : "username",
-      "message" : "Username must not be blank"
-    },
     {
       "field" : "email",
       "message" : "Invalid email format"
@@ -74,8 +67,6 @@ Response Body (Success) :
 ```json
 {
   "data" : {
-    "id" : 1,
-    "username" : "khannedy",
     "email" : "khannedy@example.com",
     "phone" : "+628123456789",
     "name" : "Eko Kurniawan Khannedy",

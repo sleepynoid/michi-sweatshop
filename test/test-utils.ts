@@ -5,17 +5,13 @@ export class UserTest {
         // Delete first to avoid unique constraint errors
         await prismaClient.user.deleteMany({
             where: {
-                OR: [
-                    { username: "test" },
-                    { email: "test@example.com" }
-                ]
+                email: "test@example.com"
             }
         })
 
         // Then create fresh user
         await prismaClient.user.create({
             data: {
-                username: "test",
                 email: "test@example.com",
                 phone: "+628123456789",
                 name: "test",
@@ -30,7 +26,7 @@ export class UserTest {
     static async delete() {
         await prismaClient.user.deleteMany({
             where: {
-                username: "test"
+                email: "test@example.com"
             }
         })
     }

@@ -78,11 +78,10 @@ Menyimpan data pengguna dan autentikasi.
 
 **Fields:**
 - `uuid` (UUID, Primary Key) - ID unik user
-- `username` (String, Unique) - Username untuk login
-- `email` (String, Unique) - Email user
+- `email` (String, Unique) - Email user (digunakan untuk login)
 - `phone` (String) - Nomor telepon
 - `password` (String) - Password ter-hash
-- `name` (String) - Nama lengkap
+- `name` (String) - Nama lengkap (digunakan untuk display)
 - `role` (String, default: "user") - Role user (user/admin)
 - `token` (String?, Nullable) - JWT token untuk autentikasi
 - `createdAt` (DateTime) - Waktu pembuatan

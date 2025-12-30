@@ -17,7 +17,6 @@ describe('POST /api/users', () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                username: "",
                 email: "",
                 phone: "",
                 password: "",
@@ -38,7 +37,6 @@ describe('POST /api/users', () => {
         const response = await app.request('/api/users', {
             method: 'post',
             body: JSON.stringify({
-                username: "test",
                 email: "test@example.com",
                 phone: "+628123456789",
                 name: "test",
@@ -57,7 +55,6 @@ describe('POST /api/users', () => {
         const response = await app.request('/api/users', {
             method: 'post',
             body: JSON.stringify({
-                username: "test",
                 email: "test@example.com",
                 phone: "+628123456789",
                 name: "test",
@@ -70,14 +67,13 @@ describe('POST /api/users', () => {
 
         expect(response.status).toBe(200)
         expect(body.data).toBeDefined()
-        expect(body.data.username).toBe("test")
         expect(body.data.email).toBe("test@example.com")
         expect(body.data.phone).toBe("+628123456789")
         expect(body.data.name).toBe("test")
     })
 })
 
-describe('POST /api/users/login' ,() => {
+describe('POST /api/users/login', () => {
     afterEach(async () => {
         UserTest.delete()
     })
@@ -99,7 +95,6 @@ describe('POST /api/users/login' ,() => {
 
         expect(response.status).toBe(200)
         expect(body.data).toBeDefined()
-        expect(body.data.username).toBe('test')
         expect(body.data.email).toBe('test@example.com')
         expect(body.data.phone).toBe('+628123456789')
         expect(body.data.name).toBe('test')

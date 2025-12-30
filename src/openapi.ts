@@ -22,14 +22,13 @@ export const openApiSpec = {
               schema: {
                 type: 'object',
                 properties: {
-                  username: { type: 'string', description: 'Username for the account' },
                   email: { type: 'string', format: 'email', description: 'Email address' },
                   phone: { type: 'string', description: 'Phone number' },
                   password: { type: 'string', minLength: 6, description: 'Password (min 6 characters)' },
                   name: { type: 'string', description: 'Full name' },
                   role: { type: 'string', description: 'User role (default: user)' }
                 },
-                required: ['username', 'email', 'phone', 'password', 'name']
+                required: ['email', 'phone', 'password', 'name']
               }
             }
           }
@@ -45,7 +44,6 @@ export const openApiSpec = {
                     data: {
                       type: 'object',
                       properties: {
-                        username: { type: 'string' },
                         email: { type: 'string' },
                         phone: { type: 'string' },
                         name: { type: 'string' },
@@ -111,7 +109,6 @@ export const openApiSpec = {
                     data: {
                       type: 'object',
                       properties: {
-                        username: { type: 'string' },
                         email: { type: 'string' },
                         phone: { type: 'string' },
                         name: { type: 'string' },
