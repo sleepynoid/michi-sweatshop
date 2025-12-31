@@ -485,4 +485,51 @@ export class ProductService {
             mime_type: image.mime_type || request.mimeType
         };
     }
+
+    static async deleteImage(productId: string, imageId: string): Promise<boolean> {
+        // Validate UUIDs
+        validateUUID(productId, "Product");
+        validateUUID(imageId, "Image");
+
+        // Check if product exists
+        const product = await prismaClient.product.findFirst({
+            where: { uuid: productId }
+        });
+
+        if (!product) {
+            throw new HTTPException(404, { message: "Product not found" });
+        }
+
+        // Find the image
+        const image = await prismaClient.image.findFirst({
+            where: {
+                uuid: imageId,
+                productId: productId
+            }
+        });
+
+        if (!image) {
+            throw new HTTPException(404, { message: "Image not found" });
+        }
+
+        // If image is stored locally (starts with /uploads/), delete the file
+        if (image.url.startsWith('/uploads/') && image.filename) {
+            const uploadDir = process.env.UPLOAD_DIR || './uploads';
+            const filePath = path.join(uploadDir, 'products', productId, image.filename);
+
+            try {
+                await fs.unlink(filePath);
+            } catch (error) {
+                // File might not exist, continue with database deletion
+                console.warn(`Could not delete file: ${filePath}`);
+            }
+        }
+
+        // Delete from database
+        await prismaClient.image.delete({
+            where: { uuid: imageId }
+        });
+
+        return true;
+    }
 }

@@ -13,7 +13,7 @@ import { logger } from 'hono/logger'
 
 const app = new Hono()
 
-  app.use('/api/*', cors({
+app.use('/api/*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['*'],
@@ -57,6 +57,14 @@ app.use('/api/products/:uuid/images', (c, next) => {
   }
   return next()
 })  // POST requires auth
+
+app.use('/api/products/:uuid/images/:imageId', (c, next) => {
+  if (c.req.method === 'DELETE') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // DELETE requires auth
+
 
 app.use('/api/products/:uuid/images/upload', (c, next) => {
   if (c.req.method === 'POST') {

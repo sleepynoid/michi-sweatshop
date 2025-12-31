@@ -213,6 +213,18 @@ export const openApiSpec = {
                                 updated_at: { type: 'string', format: 'date-time' }
                               }
                             }
+                          },
+                          images: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                uuid: { type: 'string' },
+                                url: { type: 'string' },
+                                alt_text: { type: 'string' },
+                                position: { type: 'number' }
+                              }
+                            }
                           }
                         }
                       }
@@ -314,6 +326,18 @@ export const openApiSpec = {
                               updated_at: { type: 'string', format: 'date-time' }
                             }
                           }
+                        },
+                        images: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              uuid: { type: 'string' },
+                              url: { type: 'string' },
+                              alt_text: { type: 'string' },
+                              position: { type: 'number' }
+                            }
+                          }
                         }
                       }
                     }
@@ -406,6 +430,18 @@ export const openApiSpec = {
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
                               updated_at: { type: 'string', format: 'date-time' }
+                            }
+                          }
+                        },
+                        images: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              uuid: { type: 'string' },
+                              url: { type: 'string' },
+                              alt_text: { type: 'string' },
+                              position: { type: 'number' }
                             }
                           }
                         }
@@ -518,6 +554,18 @@ export const openApiSpec = {
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
                               updated_at: { type: 'string', format: 'date-time' }
+                            }
+                          }
+                        },
+                        images: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              uuid: { type: 'string' },
+                              url: { type: 'string' },
+                              alt_text: { type: 'string' },
+                              position: { type: 'number' }
                             }
                           }
                         }
@@ -692,6 +740,18 @@ export const openApiSpec = {
                               }
                             }
                           }
+                        },
+                        images: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              uuid: { type: 'string' },
+                              url: { type: 'string' },
+                              alt_text: { type: 'string' },
+                              position: { type: 'number' }
+                            }
+                          }
                         }
                       }
                     }
@@ -718,7 +778,7 @@ export const openApiSpec = {
     },
     '/api/products/{uuid}/images': {
       post: {
-        summary: 'Upload product image (URL-based)',
+        summary: 'Link product image (URL-based)',
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -910,6 +970,70 @@ export const openApiSpec = {
           },
           404: {
             description: 'Product not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/products/{uuid}/images/{imageId}': {
+      delete: {
+        summary: 'Delete product image',
+        description: 'Delete an image from a product. For locally stored images, the file will also be removed from disk.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'uuid',
+            in: 'path',
+            required: true,
+            description: 'Product UUID',
+            schema: { type: 'string' }
+          },
+          {
+            name: 'imageId',
+            in: 'path',
+            required: true,
+            description: 'Image UUID',
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Image deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'boolean' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Product or image not found',
             content: {
               'application/json': {
                 schema: {

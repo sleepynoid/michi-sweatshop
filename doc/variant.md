@@ -5,6 +5,7 @@
 Endpoint: POST /api/variants
 
 Request Header:
+
 - Authorization: Bearer token
 
 Request Body:
@@ -132,6 +133,7 @@ Response Body (Not Found):
 Endpoint: PATCH /api/variants/{uuid}
 
 Request Header:
+
 - Authorization: Bearer token
 
 Request Body:
@@ -203,7 +205,8 @@ Response Body (Failed - Validation):
 
 ## Variant Data Structure
 
-### Variant Fields:
+### Variant Fields
+
 - **uuid**: Unique identifier for the variant
 - **title**: Display name of the variant
 - **price**: Price in cents (integer)
@@ -216,7 +219,8 @@ Response Body (Failed - Validation):
 - **images**: Array of associated images (can be empty)
 - **inventory_item**: Associated inventory item details
 
-### Inventory Item Fields:
+### Inventory Item Fields
+
 - **uuid**: Unique identifier for the inventory item
 - **sku**: Stock Keeping Unit (matches variant SKU)
 - **tracked**: Whether inventory is tracked (boolean)
@@ -227,21 +231,25 @@ Response Body (Failed - Validation):
 
 ## Business Rules
 
-### SKU Uniqueness:
+### SKU Uniqueness
+
 - Each variant must have a unique SKU across the entire system
 - SKU cannot be changed to an existing SKU during updates
 
-### Product Association:
+### Product Association
+
 - Variants must be associated with an existing product via `productId`
 - Cannot create variants for non-existent products
 
-### Inventory Management:
+### Inventory Management
+
 - `inventory_policy` determines behavior when inventory is insufficient:
   - `"deny"`: Prevent sale when out of stock
   - `"continue"`: Allow sale even when out of stock
 - `inventory_quantity` is automatically updated based on `inventory_item.available`
 
-### Required Fields:
+### Required Fields
+
 - `productId`: Must reference an existing product
 - `title`: Display name (cannot be blank)
 - `price`: Must be a positive integer
@@ -252,10 +260,10 @@ Response Body (Failed - Validation):
 
 ## Example Usage
 
-### Create a Size Variant:
+### Create a Size Variant
 
 ```bash
-curl -X POST "http://localhost:3000/api/variants" \
+curl -X POST "http://localhost:4000/api/variants" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -274,10 +282,10 @@ curl -X POST "http://localhost:3000/api/variants" \
   }'
 ```
 
-### Update Variant Price:
+### Update Variant Price
 
 ```bash
-curl -X PATCH "http://localhost:3000/api/variants/550e8400-e29b-41d4-a716-446655440002" \
+curl -X PATCH "http://localhost:4000/api/variants/550e8400-e29b-41d4-a716-446655440002" \
   -H "Authorization: Bearer your-jwt-token" \
   -H "Content-Type: application/json" \
   -d '{
@@ -288,8 +296,8 @@ curl -X PATCH "http://localhost:3000/api/variants/550e8400-e29b-41d4-a716-446655
   }'
 ```
 
-### Get Variant Details:
+### Get Variant Details
 
 ```bash
-curl -X GET "http://localhost:3000/api/variants/550e8400-e29b-41d4-a716-446655440002" \
+curl -X GET "http://localhost:4000/api/variants/550e8400-e29b-41d4-a716-446655440002" \
   -H "Authorization: Bearer your-jwt-token"

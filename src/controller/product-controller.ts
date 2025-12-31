@@ -114,3 +114,14 @@ ProductController.post('/api/products/:uuid/images/upload', async (c) => {
 
     return c.json({ data: response })
 })
+
+ProductController.delete('/api/products/:uuid/images/:imageId', async (c) => {
+    const productId = c.req.param('uuid')
+    const imageId = c.req.param('imageId')
+
+    const response = await ProductService.deleteImage(productId, imageId)
+
+    return c.json({
+        data: response
+    })
+})

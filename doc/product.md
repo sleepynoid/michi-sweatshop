@@ -5,6 +5,7 @@
 Endpoint: POST /api/products
 
 Request Header:
+
 - Authorization: Bearer token
 
 Request Body:
@@ -255,6 +256,7 @@ Response Body (Not Found):
 Endpoint: PATCH /api/products/{uuid}
 
 Request Header:
+
 - Authorization: Bearer token
 
 Request Body:
@@ -336,6 +338,7 @@ Response Body (Failed):
 Endpoint: DELETE /api/products/{uuid}
 
 Request Header:
+
 - Authorization: Bearer token
 
 Response Body (Success):
@@ -359,10 +362,12 @@ Response Body (Not Found):
 Endpoint: POST /api/products/{uuid}/images/upload
 
 Request Header:
+
 - Authorization: Bearer token
 - Content-Type: multipart/form-data
 
 Request Body (Form Data):
+
 - image: File (required) - Image file (JPEG, PNG, GIF, WebP)
 - alt_text: String (optional) - Alternative text for the image
 - position: Number (optional) - Display position of the image (auto-assigned if not provided)
@@ -427,24 +432,26 @@ Response Body (Unauthorized):
 }
 ```
 
-### File Upload Specifications:
+### File Upload Specifications
+
 - **Supported Formats**: JPEG, PNG, GIF, WebP, and other image formats
 - **Maximum File Size**: 2MB
 - **Storage Location**: `./uploads/products/{productId}/`
 - **File Naming**: UUID-based unique filename to prevent conflicts
 - **Access**: Public access via `/uploads/*` static route
 
-### Example Usage (cURL):
+### Example Usage (cURL)
 
 ```bash
-curl -X POST "http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000/images/upload" \
+```bash
+curl -X POST "http://localhost:4000/api/products/550e8400-e29b-41d4-a716-446655440000/images/upload" \
   -H "Authorization: Bearer your-jwt-token" \
   -F "image=@/path/to/image.jpg" \
   -F "alt_text=Product main image" \
   -F "position=0"
 ```
 
-### Example Usage (JavaScript/Fetch):
+### Example Usage (JavaScript/Fetch)
 
 ```javascript
 const formData = new FormData();
@@ -463,11 +470,14 @@ const response = await fetch('/api/products/{productId}/images/upload', {
 const result = await response.json();
 ```
 
-## Upload Product Image (URL-based)
+## Upload Product Image (Link URL)
+
+Use this endpoint to **link** an external image URL to the product. The image is NOT downloaded to the server, only the URL is stored.
 
 Endpoint: POST /api/products/{uuid}/images
 
 Request Header:
+
 - Authorization: Bearer token
 - Content-Type: application/json
 
@@ -516,15 +526,17 @@ Response Body (Failed):
 Uploaded images are accessible via public URLs:
 
 ```
-http://localhost:3000/uploads/products/{productId}/{filename}
+http://localhost:4000/uploads/products/{productId}/{filename}
 ```
 
-### Example:
+### Example
+
 ```
-http://localhost:3000/uploads/products/550e8400-e29b-41d4-a716-446655440000/unique-filename.jpg
+http://localhost:4000/uploads/products/550e8400-e29b-41d4-a716-446655440000/unique-filename.jpg
 ```
 
-### Image Metadata Fields:
+### Image Metadata Fields
+
 - **uuid**: Unique identifier for the image record
 - **url**: Full URL path to access the image
 - **alt_text**: Alternative text for accessibility
@@ -536,3 +548,55 @@ http://localhost:3000/uploads/products/550e8400-e29b-41d4-a716-446655440000/uniq
 - **updated_at**: Last modification timestamp
 - **productId**: Associated product UUID
 - **variantId**: Associated variant UUID (null for product images)
+
+## Delete Product Image
+
+Endpoint: DELETE /api/products/{uuid}/images/{imageId}
+
+Request Header:
+
+- Authorization: Bearer token
+
+Response Body (Success):
+
+```json
+{
+  "data": true
+}
+```
+
+Response Body (Product Not Found):
+
+```json
+{
+  "errors": "Product not found"
+}
+```
+
+Response Body (Image Not Found):
+
+```json
+{
+  "errors": "Image not found"
+}
+```
+
+Response Body (Unauthorized):
+
+```json
+{
+  "errors": "Unauthorized"
+}
+```
+
+### Notes
+
+- For locally stored images (URLs starting with `/uploads/`), the file will also be deleted from disk.
+- For externally linked images (URLs starting with `http://` or `https://`), only the database record is removed.
+
+### Example Usage (cURL)
+
+```bash
+curl -X DELETE "http://localhost:4000/api/products/550e8400-e29b-41d4-a716-446655440000/images/f47ac10b-58cc-4372-a567-0e02b2c3d479" \
+  -H "Authorization: Bearer your-jwt-token"
+```

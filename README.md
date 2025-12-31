@@ -9,16 +9,19 @@
 ## 🛠️ Teknologi Stack
 
 ### Runtime & Framework
+
 - **Runtime**: [Bun](https://bun.sh/) - JavaScript runtime yang cepat dan modern
 - **Framework**: [Hono](https://hono.dev/) v4.9.9 - Web framework yang ringan dan cepat
 - **Language**: TypeScript
 
 ### Database & ORM
+
 - **Database**: PostgreSQL
 - **ORM**: Prisma v6.16.2
 - **Schema Location**: `prisma/schema.prisma`
 
 ### Dependencies Utama
+
 - `@prisma/client` - Prisma ORM client
 - `@scalar/hono-api-reference` - API documentation dengan Scalar UI
 - `hono` - Web framework
@@ -74,9 +77,11 @@ michi-sweatshop/
 ## 🗄️ Database Schema
 
 ### Model: User
+
 Menyimpan data pengguna dan autentikasi.
 
 **Fields:**
+
 - `uuid` (UUID, Primary Key) - ID unik user
 - `email` (String, Unique) - Email user (digunakan untuk login)
 - `phone` (String) - Nomor telepon
@@ -88,9 +93,11 @@ Menyimpan data pengguna dan autentikasi.
 - `updatedAt` (DateTime) - Waktu update terakhir
 
 ### Model: Product
+
 Menyimpan informasi produk utama.
 
 **Fields:**
+
 - `uuid` (UUID, Primary Key)
 - `title` (String) - Nama produk
 - `description` (String) - Deskripsi produk
@@ -103,13 +110,16 @@ Menyimpan informasi produk utama.
 - `updated_at` (DateTime)
 
 **Relations:**
+
 - `images` → Image[] (One-to-Many, Cascade Delete)
 - `variants` → Variant[] (One-to-Many, Cascade Delete)
 
 ### Model: Variant
+
 Menyimpan variasi produk (ukuran, warna, dll).
 
 **Fields:**
+
 - `uuid` (UUID, Primary Key)
 - `title` (String) - Nama variant
 - `price` (Int) - Harga dalam satuan terkecil (cents/rupiah)
@@ -122,14 +132,17 @@ Menyimpan variasi produk (ukuran, warna, dll).
 - `productId` (UUID, Foreign Key)
 
 **Relations:**
+
 - `product` → Product (Many-to-One, Cascade Delete)
 - `inventory_item` → InventoryItem? (One-to-One, Cascade Delete)
 - `images` → Image[] (One-to-Many, Cascade Delete)
 
 ### Model: InventoryItem
+
 Menyimpan detail inventory untuk setiap variant.
 
 **Fields:**
+
 - `uuid` (UUID, Primary Key)
 - `sku` (String)
 - `tracked` (Boolean) - Apakah stok di-track
@@ -140,12 +153,15 @@ Menyimpan detail inventory untuk setiap variant.
 - `variantId` (UUID, Unique, Foreign Key)
 
 **Relations:**
+
 - `variant` → Variant (One-to-One, Cascade Delete)
 
 ### Model: Image
+
 Menyimpan gambar produk dan variant.
 
 **Fields:**
+
 - `uuid` (UUID, Primary Key)
 - `url` (String) - URL/path gambar
 - `alt_text` (String?, Nullable) - Teks alternatif
@@ -161,10 +177,12 @@ Menyimpan gambar produk dan variant.
 - `height` (Int?, Nullable) - Tinggi gambar
 
 **Relations:**
+
 - `product` → Product? (Many-to-One, Cascade Delete)
 - `variant` → Variant? (Many-to-One, Cascade Delete)
 
 **Constraints:**
+
 - Unique constraint: `[productId, position]`
 - Unique constraint: `[variantId, position]`
 
@@ -175,10 +193,13 @@ Menyimpan gambar produk dan variant.
 ### User Management
 
 #### Register User
+
 ```
 POST /api/users
 ```
+
 **Request Body:**
+
 ```json
 {
   "username": "string",
@@ -190,16 +211,20 @@ POST /api/users
 ```
 
 #### Login User
+
 ```
 POST /api/users/login
 ```
+
 **Request Body:**
+
 ```json
 {
   "email": "string",
   "password": "string"
 }
 ```
+
 **Response:** Returns user data with JWT token
 
 > **Note:** Login menggunakan `email`, bukan `username`
@@ -209,11 +234,14 @@ POST /api/users/login
 ### Product Management
 
 #### Create Product
+
 ```
 POST /api/products
 Authorization: Bearer {token}
 ```
+
 **Request Body:**
+
 ```json
 {
   "title": "string",
@@ -248,35 +276,45 @@ Authorization: Bearer {token}
 ```
 
 #### Get All Products (Paginated)
+
 ```
 GET /api/products?page=1&limit=10
 ```
+
 **Response:** Returns paginated product list
 
 #### Get Product by ID
+
 ```
 GET /api/products/{uuid}
 ```
+
 **Response:** Returns product with variants and images
 
 #### Get Product Detail (with Inventory)
+
 ```
 GET /api/products/{uuid}/detail
 ```
+
 **Response:** Returns product with variants, images, and inventory items
 
 #### Update Product
+
 ```
 PATCH /api/products/{uuid}
 Authorization: Bearer {token}
 ```
+
 **Request Body:** Partial update (semua field optional)
 
 #### Delete Product
+
 ```
 DELETE /api/products/{uuid}
 Authorization: Bearer {token}
 ```
+
 **Response:** Returns `{ "data": true }`
 
 ---
@@ -284,27 +322,34 @@ Authorization: Bearer {token}
 ### Image Upload
 
 #### Upload Image File
+
 ```
 POST /api/products/{uuid}/images/upload
 Authorization: Bearer {token}
 Content-Type: multipart/form-data
 ```
+
 **Form Data:**
+
 - `image` (File, required) - Image file
 - `alt_text` (String, optional)
 - `position` (Number, optional)
 
 **Validations:**
+
 - File must be an image
 - Max file size: 2MB
 - Stored in: `./uploads/products/{productId}/`
 
 #### Upload Image URL
+
 ```
 POST /api/products/{uuid}/images
 Authorization: Bearer {token}
 ```
+
 **Request Body:**
+
 ```json
 {
   "url": "string",
@@ -318,23 +363,27 @@ Authorization: Bearer {token}
 ### Variant Management
 
 #### Create Variant
+
 ```
 POST /api/variants
 Authorization: Bearer {token}
 ```
 
 #### Get Variant by ID
+
 ```
 GET /api/variants/{uuid}
 ```
 
 #### Update Variant
+
 ```
 PATCH /api/variants/{uuid}
 Authorization: Bearer {token}
 ```
 
 #### Delete Variant
+
 ```
 DELETE /api/variants/{uuid}
 Authorization: Bearer {token}
@@ -345,13 +394,16 @@ Authorization: Bearer {token}
 ## 🔐 Authentication & Authorization
 
 ### Middleware: `auth-middleware.ts`
+
 - Memvalidasi JWT token dari header `Authorization: Bearer {token}`
 - Token disimpan di database pada kolom `User.token`
 - Jika token tidak valid atau tidak ada, return 401 Unauthorized
 - User yang terautentikasi disimpan di context: `c.set('user', user)`
 
 ### Protected Routes
+
 Routes yang memerlukan autentikasi:
+
 - `POST /api/products` - Create product
 - `PATCH /api/products/:uuid` - Update product
 - `DELETE /api/products/:uuid` - Delete product
@@ -362,7 +414,9 @@ Routes yang memerlukan autentikasi:
 - `DELETE /api/variants/:uuid` - Delete variant
 
 ### Public Routes
+
 Routes yang dapat diakses tanpa autentikasi:
+
 - `GET /api/products` - List products
 - `GET /api/products/:uuid` - Get product detail
 - `GET /api/products/:uuid/detail` - Get product with inventory
@@ -375,15 +429,19 @@ Routes yang dapat diakses tanpa autentikasi:
 Project ini menggunakan **Scalar API Reference** untuk dokumentasi interaktif.
 
 ### Akses Dokumentasi
+
 ```
 GET /docs
 ```
+
 Membuka UI dokumentasi API yang interaktif
 
 ### OpenAPI Spec
+
 ```
 GET /openapi.json
 ```
+
 Mendapatkan OpenAPI specification dalam format JSON
 
 ---
@@ -391,35 +449,42 @@ Mendapatkan OpenAPI specification dalam format JSON
 ## 🔧 Configuration & Environment
 
 ### Environment Variables
+
 File: `.env`
 
 **Required:**
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `UPLOAD_DIR` (optional) - Directory untuk file upload (default: `./uploads`)
 
 ### Running the Application
 
 **Install dependencies:**
+
 ```bash
 bun install
 ```
 
 **Run development server:**
+
 ```bash
 bun run dev
 ```
 
 **Run database migrations:**
+
 ```bash
 bunx prisma migrate dev
 ```
 
 **Generate Prisma client:**
+
 ```bash
 bunx prisma generate
 ```
 
 **Access:**
+
 - API: `http://localhost:4000`
 - Documentation: `http://localhost:4000/docs`
 
@@ -428,6 +493,7 @@ bunx prisma generate
 ## 🎯 Fitur Utama
 
 ### 1. Product Management
+
 - ✅ CRUD operations untuk products
 - ✅ Support multiple variants per product
 - ✅ Inventory tracking per variant
@@ -436,6 +502,7 @@ bunx prisma generate
 - ✅ Tags untuk categorization
 
 ### 2. Image Management
+
 - ✅ Upload gambar via file (multipart/form-data)
 - ✅ Upload gambar via URL
 - ✅ File validation (type & size)
@@ -445,18 +512,21 @@ bunx prisma generate
 - ✅ Public access via `/uploads/*` route
 
 ### 3. Inventory Management
+
 - ✅ Track inventory per variant
 - ✅ Inventory policy (deny/continue)
 - ✅ Cost tracking
 - ✅ Available quantity management
 
 ### 4. User Authentication
+
 - ✅ User registration
 - ✅ User login dengan JWT token
 - ✅ Token-based authentication
 - ✅ Role-based access (user/admin)
 
 ### 5. Validation & Error Handling
+
 - ✅ Zod schema validation
 - ✅ UUID validation untuk semua ID
 - ✅ Custom error classes (ValidationError, DuplicateError, AuthenticationError)
@@ -464,6 +534,7 @@ bunx prisma generate
 - ✅ Proper HTTP status codes
 
 ### 6. CORS & Security
+
 - ✅ CORS enabled untuk semua `/api/*` routes
 - ✅ Bearer token authentication
 - ✅ Selective route protection
@@ -473,21 +544,27 @@ bunx prisma generate
 ## 📝 Catatan Penting
 
 ### Cascade Delete
+
 Semua relasi menggunakan `onDelete: Cascade`, artinya:
+
 - Menghapus Product → otomatis menghapus semua Variants, Images, dan InventoryItems terkait
 - Menghapus Variant → otomatis menghapus InventoryItem dan Images terkait
 
 ### UUID Generation
+
 Semua ID menggunakan PostgreSQL function `gen_random_uuid()` untuk generate UUID secara otomatis.
 
 ### File Upload
+
 - Files disimpan di `./uploads/products/{productId}/`
 - Filename menggunakan UUID untuk menghindari konflik
 - Max file size: 2MB
 - Supported formats: semua image types
 
 ### Price & Cost
+
 Semua harga dan cost disimpan dalam **integer** (satuan terkecil), misalnya:
+
 - Rp 800.000 → disimpan sebagai `800000`
 - $10.50 → disimpan sebagai `1050` (cents)
 
@@ -496,12 +573,15 @@ Semua harga dan cost disimpan dalam **integer** (satuan terkecil), misalnya:
 ## 🚀 Development Notes
 
 ### Hot Reload
+
 Development server menggunakan `bun run --hot` untuk hot reload otomatis saat file berubah.
 
 ### Prisma Client
+
 Prisma client di-generate ke `src/generated/prisma/` (custom output path).
 
 ### Logging
+
 - Request logging menggunakan Hono's built-in logger middleware
 - Winston tersedia untuk custom logging
 
@@ -510,11 +590,13 @@ Prisma client di-generate ke `src/generated/prisma/` (custom output path).
 Test files tersimpan di direktori `test/`.
 
 **Run all tests:**
+
 ```bash
 bun test
 ```
 
 **Test Coverage:**
+
 - 33 test cases
 - User authentication tests
 - Product CRUD tests
@@ -527,6 +609,7 @@ bun test
 ## 📖 Dokumentasi Tambahan
 
 Dokumentasi API detail tersedia di:
+
 - [doc/product.md](doc/product.md) - Product API documentation
 - [doc/user.md](doc/user.md) - User API documentation
 - [doc/variant.md](doc/variant.md) - Variant API documentation
@@ -534,6 +617,9 @@ Dokumentasi API detail tersedia di:
 ---
 
 ## 🎨 Arsitektur Pattern
+
+Design Database
+<https://dbdiagram.io/d/michi-sweatshop-68dfc771d2b621e42224a911>
 
 Project ini menggunakan **layered architecture**:
 
@@ -571,7 +657,6 @@ Project ini menggunakan **layered architecture**:
 erDiagram
     User {
         uuid uuid PK
-        username string UK
         email string UK
         phone string
         password string
@@ -634,6 +719,7 @@ erDiagram
 ## ✅ Kesimpulan
 
 **Michi Sweatshop** adalah backend API e-commerce yang well-structured dengan fitur lengkap untuk:
+
 - Manajemen produk dengan multiple variants
 - Inventory tracking
 - Image management (upload & URL-based)
