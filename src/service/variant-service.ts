@@ -43,7 +43,15 @@ export class VariantService {
                 cost: request.cost,
                 inventory_policy: request.inventory_policy,
                 option1: request.option1,
-                productId: request.productId
+                productId: request.productId,
+                images: request.images ? {
+                    create: request.images.map((image, index) => ({
+                        url: image.url,
+                        alt_text: image.alt_text,
+                        position: image.position ?? index,
+                        productId: request.productId!
+                    }))
+                } : undefined
             },
             include: {
                 images: true

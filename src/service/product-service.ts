@@ -13,8 +13,11 @@ export class ProductService {
     static async create(request: CreateProductRequest): Promise<ProductResponse> {
         request = ProductValidation.CREATE.parse(request);
 
+        const productUuid = randomUUID();
+
         const product = await prismaClient.product.create({
             data: {
+                uuid: productUuid,
                 title: request.title,
                 description: request.description,
                 product_type: request.product_type,
@@ -30,7 +33,15 @@ export class ProductService {
                         available: variant.available,
                         cost: variant.cost,
                         inventory_policy: variant.inventory_policy,
-                        option1: variant.option1
+                        option1: variant.option1,
+                        images: variant.images ? {
+                            create: variant.images.map((image, index) => ({
+                                url: image.url,
+                                alt_text: image.alt_text,
+                                position: image.position ?? index,
+                                productId: productUuid
+                            }))
+                        } : undefined
                     }))
                 },
                 images: request.images ? {
@@ -42,7 +53,11 @@ export class ProductService {
                 } : undefined
             },
             include: {
-                variants: true,
+                variants: {
+                    include: {
+                        images: true
+                    }
+                },
                 images: true
             }
         });
@@ -69,7 +84,8 @@ export class ProductService {
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
-                updated_at: variant.updated_at
+                updated_at: variant.updated_at,
+                images: variant.images
             }))
         };
     }

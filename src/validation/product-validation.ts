@@ -15,7 +15,12 @@ export class ProductValidation {
       inventory_policy: z.string().min(1, 'Inventory policy must not be blank'),
       option1: z.string().min(1, 'Option1 must not be blank'),
       available: z.number().int().min(0, 'Available must be non-negative'),
-      cost: z.number().int().min(0, 'Cost must be non-negative')
+      cost: z.number().int().min(0, 'Cost must be non-negative'),
+      images: z.array(z.object({
+        url: z.string().url('Image URL must be valid'),
+        alt_text: z.string().optional(),
+        position: z.number().int().optional()
+      })).optional()
     })).min(1, 'At least one variant is required')
   });
 
@@ -34,7 +39,12 @@ export class ProductValidation {
       inventory_policy: z.string().min(1, 'Inventory policy must not be blank').optional(),
       option1: z.string().min(1, 'Option1 must not be blank').optional(),
       available: z.number().int().min(0, 'Available must be non-negative').optional(),
-      cost: z.number().int().min(0, 'Cost must be non-negative').optional()
+      cost: z.number().int().min(0, 'Cost must be non-negative').optional(),
+      images: z.array(z.object({
+        url: z.string().url('Image URL must be valid'),
+        alt_text: z.string().optional(),
+        position: z.number().int().optional()
+      })).optional()
     })).optional()
   });
 }

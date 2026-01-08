@@ -1,4 +1,4 @@
-import { Image } from "./image-model";
+import { Image, CreateImageRequest } from "./image-model";
 
 export interface Variant {
   uuid: string;
@@ -23,6 +23,7 @@ export interface CreateVariantRequest {
   option1: string;
   available: number;
   cost: number;
+  images?: CreateImageRequest[];
 }
 
 export interface UpdateVariantRequest {
@@ -34,4 +35,5 @@ export interface UpdateVariantRequest {
   option1?: string;
   available?: number;
   cost?: number;
+  images?: CreateImageRequest[];
 }

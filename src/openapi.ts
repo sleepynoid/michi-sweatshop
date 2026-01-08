@@ -273,7 +273,18 @@ export const openApiSpec = {
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
                         available: { type: 'number' },
-                        cost: { type: 'number' }
+                        cost: { type: 'number' },
+                        images: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              url: { type: 'string' },
+                              alt_text: { type: 'string' },
+                              position: { type: 'number' }
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -318,7 +329,21 @@ export const openApiSpec = {
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
-                              updated_at: { type: 'string', format: 'date-time' }
+                              updated_at: { type: 'string', format: 'date-time' },
+                              images: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    uuid: { type: 'string' },
+                                    url: { type: 'string' },
+                                    alt_text: { type: 'string' },
+                                    position: { type: 'number' },
+                                    created_at: { type: 'string', format: 'date-time' },
+                                    updated_at: { type: 'string', format: 'date-time' }
+                                  }
+                                }
+                              }
                             }
                           }
                         },
@@ -1045,7 +1070,18 @@ export const openApiSpec = {
                   inventory_policy: { type: 'string' },
                   option1: { type: 'string' },
                   available: { type: 'number' },
-                        cost: { type: 'number' }
+                  cost: { type: 'number' },
+                  images: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        url: { type: 'string' },
+                        alt_text: { type: 'string' },
+                        position: { type: 'number' }
+                      }
+                    }
+                  }
                 },
                 required: ['productId', 'title', 'price', 'sku', 'inventory_policy', 'option1']
               }
@@ -1228,7 +1264,7 @@ export const openApiSpec = {
                   inventory_policy: { type: 'string' },
                   option1: { type: 'string' },
                   available: { type: 'number' },
-                        cost: { type: 'number' }
+                  cost: { type: 'number' }
                 }
               }
             }
