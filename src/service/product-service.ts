@@ -1,7 +1,6 @@
 import { prismaClient } from "../Application/database";
 import { CreateProductRequest, ProductDetailResponse, ProductResponse, PaginatedProductsResponse, UpdateProductRequest } from "../model/product-model";
 import { CreateVariantRequest, UpdateVariantRequest } from "../model/variant-model";
-import { CreateInventoryItemRequest, UpdateInventoryItemRequest } from "../model/inventory-item-model";
 import { CreateImageRequest, Image } from "../model/image-model";
 import { ProductValidation } from "../validation/product-validation";
 import { HTTPException } from "hono/http-exception";
@@ -28,17 +27,10 @@ export class ProductService {
                         title: variant.title,
                         price: variant.price,
                         sku: variant.sku,
-                        inventory_quantity: variant.inventory_item.available,
+                        available: variant.available,
+                        cost: variant.cost,
                         inventory_policy: variant.inventory_policy,
-                        option1: variant.option1,
-                        inventory_item: {
-                            create: {
-                                sku: variant.inventory_item.sku,
-                                tracked: variant.inventory_item.tracked,
-                                available: variant.inventory_item.available,
-                                cost: variant.inventory_item.cost
-                            }
-                        }
+                        option1: variant.option1
                     }))
                 },
                 images: request.images ? {
@@ -50,11 +42,7 @@ export class ProductService {
                 } : undefined
             },
             include: {
-                variants: {
-                    include: {
-                        inventory_item: true
-                    }
-                },
+                variants: true,
                 images: true
             }
         });
@@ -76,7 +64,8 @@ export class ProductService {
                 title: variant.title,
                 price: variant.price,
                 sku: variant.sku,
-                inventory_quantity: variant.inventory_quantity,
+                available: variant.available,
+                cost: variant.cost,
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
@@ -121,7 +110,8 @@ export class ProductService {
                     title: variant.title,
                     price: variant.price,
                     sku: variant.sku,
-                    inventory_quantity: variant.inventory_quantity,
+                    available: variant.available,
+                    cost: variant.cost,
                     inventory_policy: variant.inventory_policy,
                     option1: variant.option1,
                     created_at: variant.created_at,
@@ -172,7 +162,8 @@ export class ProductService {
                 title: variant.title,
                 price: variant.price,
                 sku: variant.sku,
-                inventory_quantity: variant.inventory_quantity,
+                available: variant.available,
+                cost: variant.cost,
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
@@ -190,11 +181,7 @@ export class ProductService {
                 uuid: productId
             },
             include: {
-                variants: {
-                    include: {
-                        inventory_item: true
-                    }
-                },
+                variants: true,
                 images: true
             }
         });
@@ -220,20 +207,12 @@ export class ProductService {
                 title: variant.title,
                 price: variant.price,
                 sku: variant.sku,
-                inventory_quantity: variant.inventory_quantity,
+                available: variant.available,
+                cost: variant.cost,
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
-                updated_at: variant.updated_at,
-                inventory_item: variant.inventory_item ? {
-                    uuid: variant.inventory_item.uuid,
-                    sku: variant.inventory_item.sku,
-                    tracked: variant.inventory_item.tracked,
-                    available: variant.inventory_item.available,
-                    cost: variant.inventory_item.cost,
-                    created_at: variant.inventory_item.created_at,
-                    updated_at: variant.inventory_item.updated_at
-                } : undefined
+                updated_at: variant.updated_at
             }))
         };
     }
@@ -249,11 +228,7 @@ export class ProductService {
                 uuid: productId,
             },
             include: {
-                variants: {
-                    include: {
-                        inventory_item: true
-                    }
-                }
+                variants: true
             }
         });
 
@@ -273,11 +248,7 @@ export class ProductService {
                 status: request.status ?? product.status
             },
             include: {
-                variants: {
-                    include: {
-                        inventory_item: true
-                    }
-                },
+                variants: true,
                 images: true
             }
         });
@@ -295,21 +266,10 @@ export class ProductService {
                             sku: variantReq.sku ?? existingVariant.sku,
                             inventory_policy: variantReq.inventory_policy ?? existingVariant.inventory_policy,
                             option1: variantReq.option1 ?? existingVariant.option1,
-                            inventory_quantity: variantReq.inventory_item?.available ?? existingVariant.inventory_quantity
+                            available: variantReq.available ?? existingVariant.available,
+                            cost: variantReq.cost ?? existingVariant.cost
                         }
                     });
-
-                    if (variantReq.inventory_item && existingVariant.inventory_item) {
-                        await prismaClient.inventoryItem.update({
-                            where: { uuid: existingVariant.inventory_item.uuid },
-                            data: {
-                                sku: variantReq.inventory_item.sku ?? existingVariant.inventory_item.sku,
-                                tracked: variantReq.inventory_item.tracked ?? existingVariant.inventory_item.tracked,
-                                available: variantReq.inventory_item.available ?? existingVariant.inventory_item.available,
-                                cost: variantReq.inventory_item.cost ?? existingVariant.inventory_item.cost
-                            }
-                        });
-                    }
                 }
             }
         }
@@ -344,7 +304,8 @@ export class ProductService {
                 title: variant.title,
                 price: variant.price,
                 sku: variant.sku,
-                inventory_quantity: variant.inventory_quantity,
+                available: variant.available,
+                cost: variant.cost,
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,

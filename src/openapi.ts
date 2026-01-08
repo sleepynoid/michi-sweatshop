@@ -206,7 +206,8 @@ export const openApiSpec = {
                                 title: { type: 'string' },
                                 price: { type: 'number' },
                                 sku: { type: 'string' },
-                                inventory_quantity: { type: 'number' },
+                                available: { type: 'number' },
+                                cost: { type: 'number' },
                                 inventory_policy: { type: 'string' },
                                 option1: { type: 'string' },
                                 created_at: { type: 'string', format: 'date-time' },
@@ -271,15 +272,8 @@ export const openApiSpec = {
                         sku: { type: 'string' },
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
-                        inventory_item: {
-                          type: 'object',
-                          properties: {
-                            sku: { type: 'string' },
-                            tracked: { type: 'boolean' },
-                            available: { type: 'number' },
-                            cost: { type: 'number' }
-                          }
-                        }
+                        available: { type: 'number' },
+                        cost: { type: 'number' }
                       }
                     }
                   }
@@ -319,7 +313,8 @@ export const openApiSpec = {
                               title: { type: 'string' },
                               price: { type: 'number' },
                               sku: { type: 'string' },
-                              inventory_quantity: { type: 'number' },
+                              available: { type: 'number' },
+                              cost: { type: 'number' },
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
@@ -425,7 +420,8 @@ export const openApiSpec = {
                               title: { type: 'string' },
                               price: { type: 'number' },
                               sku: { type: 'string' },
-                              inventory_quantity: { type: 'number' },
+                              available: { type: 'number' },
+                              cost: { type: 'number' },
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
@@ -502,15 +498,8 @@ export const openApiSpec = {
                         sku: { type: 'string' },
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
-                        inventory_item: {
-                          type: 'object',
-                          properties: {
-                            sku: { type: 'string' },
-                            tracked: { type: 'boolean' },
-                            available: { type: 'number' },
-                            cost: { type: 'number' }
-                          }
-                        }
+                        available: { type: 'number' },
+                        cost: { type: 'number' }
                       }
                     }
                   }
@@ -549,7 +538,8 @@ export const openApiSpec = {
                               title: { type: 'string' },
                               price: { type: 'number' },
                               sku: { type: 'string' },
-                              inventory_quantity: { type: 'number' },
+                              available: { type: 'number' },
+                              cost: { type: 'number' },
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
@@ -721,23 +711,12 @@ export const openApiSpec = {
                               title: { type: 'string' },
                               price: { type: 'number' },
                               sku: { type: 'string' },
-                              inventory_quantity: { type: 'number' },
+                              available: { type: 'number' },
+                              cost: { type: 'number' },
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
-                              updated_at: { type: 'string', format: 'date-time' },
-                              inventory_item: {
-                                type: 'object',
-                                properties: {
-                                  uuid: { type: 'string' },
-                                  sku: { type: 'string' },
-                                  tracked: { type: 'boolean' },
-                                  available: { type: 'number' },
-                                  cost: { type: 'number' },
-                                  created_at: { type: 'string', format: 'date-time' },
-                                  updated_at: { type: 'string', format: 'date-time' }
-                                }
-                              }
+                              updated_at: { type: 'string', format: 'date-time' }
                             }
                           }
                         },
@@ -1065,17 +1044,10 @@ export const openApiSpec = {
                   sku: { type: 'string' },
                   inventory_policy: { type: 'string' },
                   option1: { type: 'string' },
-                  inventory_item: {
-                    type: 'object',
-                    properties: {
-                      sku: { type: 'string' },
-                      tracked: { type: 'boolean' },
-                      available: { type: 'number' },
-                      cost: { type: 'number' }
-                    }
-                  }
+                  available: { type: 'number' },
+                        cost: { type: 'number' }
                 },
-                required: ['productId', 'title', 'price', 'sku', 'inventory_policy', 'option1', 'inventory_item']
+                required: ['productId', 'title', 'price', 'sku', 'inventory_policy', 'option1']
               }
             }
           }
@@ -1095,7 +1067,8 @@ export const openApiSpec = {
                         title: { type: 'string' },
                         price: { type: 'number' },
                         sku: { type: 'string' },
-                        inventory_quantity: { type: 'number' },
+                        available: { type: 'number' },
+                        cost: { type: 'number' },
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
                         created_at: { type: 'string', format: 'date-time' },
@@ -1112,18 +1085,6 @@ export const openApiSpec = {
                               created_at: { type: 'string', format: 'date-time' },
                               updated_at: { type: 'string', format: 'date-time' }
                             }
-                          }
-                        },
-                        inventory_item: {
-                          type: 'object',
-                          properties: {
-                            uuid: { type: 'string' },
-                            sku: { type: 'string' },
-                            tracked: { type: 'boolean' },
-                            available: { type: 'number' },
-                            cost: { type: 'number' },
-                            created_at: { type: 'string', format: 'date-time' },
-                            updated_at: { type: 'string', format: 'date-time' }
                           }
                         }
                       }
@@ -1201,7 +1162,8 @@ export const openApiSpec = {
                         title: { type: 'string' },
                         price: { type: 'number' },
                         sku: { type: 'string' },
-                        inventory_quantity: { type: 'number' },
+                        available: { type: 'number' },
+                        cost: { type: 'number' },
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
                         created_at: { type: 'string', format: 'date-time' },
@@ -1218,18 +1180,6 @@ export const openApiSpec = {
                               created_at: { type: 'string', format: 'date-time' },
                               updated_at: { type: 'string', format: 'date-time' }
                             }
-                          }
-                        },
-                        inventory_item: {
-                          type: 'object',
-                          properties: {
-                            uuid: { type: 'string' },
-                            sku: { type: 'string' },
-                            tracked: { type: 'boolean' },
-                            available: { type: 'number' },
-                            cost: { type: 'number' },
-                            created_at: { type: 'string', format: 'date-time' },
-                            updated_at: { type: 'string', format: 'date-time' }
                           }
                         }
                       }
@@ -1277,15 +1227,8 @@ export const openApiSpec = {
                   sku: { type: 'string' },
                   inventory_policy: { type: 'string' },
                   option1: { type: 'string' },
-                  inventory_item: {
-                    type: 'object',
-                    properties: {
-                      sku: { type: 'string' },
-                      tracked: { type: 'boolean' },
-                      available: { type: 'number' },
-                      cost: { type: 'number' }
-                    }
-                  }
+                  available: { type: 'number' },
+                        cost: { type: 'number' }
                 }
               }
             }
@@ -1306,7 +1249,8 @@ export const openApiSpec = {
                         title: { type: 'string' },
                         price: { type: 'number' },
                         sku: { type: 'string' },
-                        inventory_quantity: { type: 'number' },
+                        available: { type: 'number' },
+                        cost: { type: 'number' },
                         inventory_policy: { type: 'string' },
                         option1: { type: 'string' },
                         created_at: { type: 'string', format: 'date-time' },
@@ -1323,18 +1267,6 @@ export const openApiSpec = {
                               created_at: { type: 'string', format: 'date-time' },
                               updated_at: { type: 'string', format: 'date-time' }
                             }
-                          }
-                        },
-                        inventory_item: {
-                          type: 'object',
-                          properties: {
-                            uuid: { type: 'string' },
-                            sku: { type: 'string' },
-                            tracked: { type: 'boolean' },
-                            available: { type: 'number' },
-                            cost: { type: 'number' },
-                            created_at: { type: 'string', format: 'date-time' },
-                            updated_at: { type: 'string', format: 'date-time' }
                           }
                         }
                       }

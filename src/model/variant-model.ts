@@ -1,4 +1,3 @@
-import { InventoryItem } from "./inventory-item-model";
 import { Image } from "./image-model";
 
 export interface Variant {
@@ -6,13 +5,13 @@ export interface Variant {
   title: string;
   price: number;
   sku: string;
-  inventory_quantity: number;
+  available: number;
+  cost: number;
   inventory_policy: string;
   option1: string;
   created_at: Date;
   updated_at: Date;
   images?: Image[];
-  inventory_item?: InventoryItem;
 }
 
 export interface CreateVariantRequest {
@@ -22,7 +21,8 @@ export interface CreateVariantRequest {
   sku: string;
   inventory_policy: string;
   option1: string;
-  inventory_item: import("./inventory-item-model").CreateInventoryItemRequest;
+  available: number;
+  cost: number;
 }
 
 export interface UpdateVariantRequest {
@@ -32,5 +32,6 @@ export interface UpdateVariantRequest {
   sku?: string;
   inventory_policy?: string;
   option1?: string;
-  inventory_item?: import("./inventory-item-model").UpdateInventoryItemRequest;
+  available?: number;
+  cost?: number;
 }

@@ -39,21 +39,13 @@ export class VariantService {
                 title: request.title,
                 price: request.price,
                 sku: request.sku,
-                inventory_quantity: request.inventory_item.available,
+                available: request.available,
+                cost: request.cost,
                 inventory_policy: request.inventory_policy,
                 option1: request.option1,
-                productId: request.productId,
-                inventory_item: {
-                    create: {
-                        sku: request.inventory_item.sku,
-                        tracked: request.inventory_item.tracked,
-                        available: request.inventory_item.available,
-                        cost: request.inventory_item.cost
-                    }
-                }
+                productId: request.productId
             },
             include: {
-                inventory_item: true,
                 images: true
             }
         });
@@ -63,23 +55,16 @@ export class VariantService {
             title: variant.title,
             price: variant.price,
             sku: variant.sku,
-            inventory_quantity: variant.inventory_quantity,
+            available: variant.available,
+            cost: variant.cost,
             inventory_policy: variant.inventory_policy,
             option1: variant.option1,
             created_at: variant.created_at,
             updated_at: variant.updated_at,
-            images: variant.images,
-            inventory_item: variant.inventory_item ? {
-                uuid: variant.inventory_item.uuid,
-                sku: variant.inventory_item.sku,
-                tracked: variant.inventory_item.tracked,
-                available: variant.inventory_item.available,
-                cost: variant.inventory_item.cost,
-                created_at: variant.inventory_item.created_at,
-                updated_at: variant.inventory_item.updated_at
-            } : undefined
+            images: variant.images
         };
     }
+
     static async update(variantId: string, request: UpdateVariantRequest): Promise<Variant> {
         // Validate variantId UUID format
         validateUUID(variantId, "Variant");
@@ -87,9 +72,6 @@ export class VariantService {
         const variant = await prismaClient.variant.findFirst({
             where: {
                 uuid: variantId
-            },
-            include: {
-                inventory_item: true
             }
         });
 
@@ -106,59 +88,26 @@ export class VariantService {
                 sku: request.sku ?? variant.sku,
                 inventory_policy: request.inventory_policy ?? variant.inventory_policy,
                 option1: request.option1 ?? variant.option1,
-                inventory_quantity: request.inventory_item?.available ?? variant.inventory_quantity
+                available: request.available ?? variant.available,
+                cost: request.cost ?? variant.cost
             },
             include: {
-                inventory_item: true
-            }
-        });
-
-        // Update inventory item if provided
-        if (request.inventory_item && variant.inventory_item) {
-            await prismaClient.inventoryItem.update({
-                where: { uuid: variant.inventory_item.uuid },
-                data: {
-                    sku: request.inventory_item.sku ?? variant.inventory_item.sku,
-                    tracked: request.inventory_item.tracked ?? variant.inventory_item.tracked,
-                    available: request.inventory_item.available ?? variant.inventory_item.available,
-                    cost: request.inventory_item.cost ?? variant.inventory_item.cost
-                }
-            });
-        }
-
-        // Fetch updated variant with inventory item
-        const finalVariant = await prismaClient.variant.findFirst({
-            where: { uuid: variantId },
-            include: {
-                inventory_item: true,
                 images: true
             }
         });
 
-        if (!finalVariant) {
-            throw new HTTPException(404, { message: "Variant not found" });
-        }
-
         return {
-            uuid: finalVariant.uuid,
-            title: finalVariant.title,
-            price: finalVariant.price,
-            sku: finalVariant.sku,
-            inventory_quantity: finalVariant.inventory_quantity,
-            inventory_policy: finalVariant.inventory_policy,
-            option1: finalVariant.option1,
-            created_at: finalVariant.created_at,
-            updated_at: finalVariant.updated_at,
-            images: finalVariant.images,
-            inventory_item: finalVariant.inventory_item ? {
-                uuid: finalVariant.inventory_item.uuid,
-                sku: finalVariant.inventory_item.sku,
-                tracked: finalVariant.inventory_item.tracked,
-                available: finalVariant.inventory_item.available,
-                cost: finalVariant.inventory_item.cost,
-                created_at: finalVariant.inventory_item.created_at,
-                updated_at: finalVariant.inventory_item.updated_at
-            } : undefined
+            uuid: updatedVariant.uuid,
+            title: updatedVariant.title,
+            price: updatedVariant.price,
+            sku: updatedVariant.sku,
+            available: updatedVariant.available,
+            cost: updatedVariant.cost,
+            inventory_policy: updatedVariant.inventory_policy,
+            option1: updatedVariant.option1,
+            created_at: updatedVariant.created_at,
+            updated_at: updatedVariant.updated_at,
+            images: updatedVariant.images
         };
     }
 
@@ -171,7 +120,6 @@ export class VariantService {
                 uuid: variantId
             },
             include: {
-                inventory_item: true,
                 images: true
             }
         });
@@ -185,21 +133,13 @@ export class VariantService {
             title: variant.title,
             price: variant.price,
             sku: variant.sku,
-            inventory_quantity: variant.inventory_quantity,
+            available: variant.available,
+            cost: variant.cost,
             inventory_policy: variant.inventory_policy,
             option1: variant.option1,
             created_at: variant.created_at,
             updated_at: variant.updated_at,
-            images: variant.images,
-            inventory_item: variant.inventory_item ? {
-                uuid: variant.inventory_item.uuid,
-                sku: variant.inventory_item.sku,
-                tracked: variant.inventory_item.tracked,
-                available: variant.inventory_item.available,
-                cost: variant.inventory_item.cost,
-                created_at: variant.inventory_item.created_at,
-                updated_at: variant.inventory_item.updated_at
-            } : undefined
+            images: variant.images
         };
     }
 }

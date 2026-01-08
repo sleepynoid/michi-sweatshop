@@ -43,31 +43,19 @@ model Product {
 }
 
 model Variant {
-  uuid                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title               String
-  price               Int
-  sku                 String         @unique
-  inventory_quantity  Int
-  inventory_policy    String
-  option1             String
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-  productId           String         @db.Uuid
-  product             Product        @relation(fields: [productId], references: [uuid], onDelete: Cascade)
-  inventory_item      InventoryItem?
-  images              Image[]
-}
-
-model InventoryItem {
-  uuid        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sku         String
-  tracked     Boolean
-  available   Int
-  cost        Int
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  variantId   String   @unique @db.Uuid
-  variant     Variant  @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
+  uuid              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title             String
+  price             Int
+  sku               String   @unique
+  available         Int
+  cost              Int
+  inventory_policy  String
+  option1           String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  productId         String   @db.Uuid
+  product           Product  @relation(fields: [productId], references: [uuid], onDelete: Cascade)
+  images            Image[]
 }
 
 model Image {

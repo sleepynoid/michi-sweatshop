@@ -41,12 +41,8 @@ describe('POST /api/variants', () => {
                 sku: "NEW-VARIANT-001",
                 inventory_policy: "deny",
                 option1: "Large",
-                inventory_item: {
-                    sku: "NEW-VARIANT-001",
-                    tracked: true,
-                    available: 30,
-                    cost: 100000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -58,12 +54,10 @@ describe('POST /api/variants', () => {
         expect(body.data.title).toBe("New Variant")
         expect(body.data.price).toBe(200000)
         expect(body.data.sku).toBe("NEW-VARIANT-001")
-        expect(body.data.inventory_quantity).toBe(30)
+        expect(body.data.available).toBe(30)
+        expect(body.data.cost).toBe(100000)
         expect(body.data.inventory_policy).toBe("deny")
         expect(body.data.option1).toBe("Large")
-        expect(body.data.inventory_item).toBeDefined()
-        expect(body.data.inventory_item.available).toBe(30)
-        expect(body.data.inventory_item.cost).toBe(100000)
     })
 
     it('should reject create variant if product not found', async () => {
@@ -93,12 +87,8 @@ describe('POST /api/variants', () => {
                 sku: "NEW-VARIANT-001",
                 inventory_policy: "deny",
                 option1: "Large",
-                inventory_item: {
-                    sku: "NEW-VARIANT-001",
-                    tracked: true,
-                    available: 30,
-                    cost: 100000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -140,12 +130,8 @@ describe('POST /api/variants', () => {
                 sku: "DUPLICATE-SKU",
                 inventory_policy: "deny",
                 option1: "Large",
-                inventory_item: {
-                    sku: "DUPLICATE-SKU",
-                    tracked: true,
-                    available: 30,
-                    cost: 100000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -163,12 +149,8 @@ describe('POST /api/variants', () => {
                 sku: "DUPLICATE-SKU",
                 inventory_policy: "deny",
                 option1: "Extra Large",
-                inventory_item: {
-                    sku: "DUPLICATE-SKU",
-                    tracked: true,
-                    available: 20,
-                    cost: 120000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -205,12 +187,8 @@ describe('POST /api/variants', () => {
                 sku: "NEW-VARIANT-001",
                 inventory_policy: "deny",
                 option1: "Large",
-                inventory_item: {
-                    sku: "NEW-VARIANT-001",
-                    tracked: true,
-                    available: 30,
-                    cost: 100000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -238,12 +216,8 @@ describe('POST /api/variants', () => {
                 sku: "NEW-VARIANT-001",
                 inventory_policy: "deny",
                 option1: "Large",
-                inventory_item: {
-                    sku: "NEW-VARIANT-001",
-                    tracked: true,
-                    available: 30,
-                    cost: 100000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -277,14 +251,10 @@ describe('GET /api/variants/:uuid', () => {
         expect(body.data.title).toBe("Test Variant")
         expect(body.data.price).toBe(100000)
         expect(body.data.sku).toBe("TEST-VARIANT-001")
-        expect(body.data.inventory_quantity).toBe(50)
+        expect(body.data.available).toBe(50)
+        expect(body.data.cost).toBe(50000)
         expect(body.data.inventory_policy).toBe("deny")
         expect(body.data.option1).toBe("Standard")
-        expect(body.data.inventory_item).toBeDefined()
-        expect(body.data.inventory_item.sku).toBe("TEST-VARIANT-001")
-        expect(body.data.inventory_item.available).toBe(50)
-        expect(body.data.inventory_item.tracked).toBe(true)
-        expect(body.data.inventory_item.cost).toBe(50000)
     })
 
     it('should reject get variant if not found', async () => {
@@ -329,10 +299,8 @@ describe('PATCH /api/variants/:uuid', () => {
             },
             body: JSON.stringify({
                 price: 120000,
-                inventory_item: {
-                    available: 75,
-                    cost: 60000
-                }
+                available: 30,
+                cost: 100000
             })
         })
 
@@ -343,9 +311,8 @@ describe('PATCH /api/variants/:uuid', () => {
         expect(body.data).toBeDefined()
         expect(body.data.uuid).toBe(variant.uuid)
         expect(body.data.price).toBe(120000)
-        expect(body.data.inventory_quantity).toBe(75)
-        expect(body.data.inventory_item.available).toBe(75)
-        expect(body.data.inventory_item.cost).toBe(60000)
+        expect(body.data.available).toBe(30)
+        expect(body.data.cost).toBe(100000)
     })
 
     it('should update variant title and sku successfully', async () => {

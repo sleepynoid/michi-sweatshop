@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { CreateInventoryItemRequest, UpdateInventoryItemRequest } from '../model/inventory-item-model';
 
 export class ProductValidation {
   static readonly CREATE = z.object({
@@ -15,12 +14,8 @@ export class ProductValidation {
       sku: z.string().min(1, 'SKU must not be blank'),
       inventory_policy: z.string().min(1, 'Inventory policy must not be blank'),
       option1: z.string().min(1, 'Option1 must not be blank'),
-      inventory_item: z.object({
-        sku: z.string().min(1, 'Inventory SKU must not be blank'),
-        tracked: z.boolean(),
-        available: z.number().int().min(0, 'Available must be non-negative'),
-        cost: z.number().int().min(0, 'Cost must be non-negative')
-      })
+      available: z.number().int().min(0, 'Available must be non-negative'),
+      cost: z.number().int().min(0, 'Cost must be non-negative')
     })).min(1, 'At least one variant is required')
   });
 
@@ -38,12 +33,8 @@ export class ProductValidation {
       sku: z.string().min(1, 'SKU must not be blank').optional(),
       inventory_policy: z.string().min(1, 'Inventory policy must not be blank').optional(),
       option1: z.string().min(1, 'Option1 must not be blank').optional(),
-      inventory_item: z.object({
-        sku: z.string().min(1, 'Inventory SKU must not be blank').optional(),
-        tracked: z.boolean().optional(),
-        available: z.number().int().min(0, 'Available must be non-negative').optional(),
-        cost: z.number().int().min(0, 'Cost must be non-negative').optional()
-      }).optional()
+      available: z.number().int().min(0, 'Available must be non-negative').optional(),
+      cost: z.number().int().min(0, 'Cost must be non-negative').optional()
     })).optional()
   });
 }

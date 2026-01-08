@@ -34,7 +34,7 @@ export class UserTest {
     static async findByUsername(username: string) {
         return await prismaClient.user.findUnique({
             where: {
-                username: username
+                email: username
             }
         })
     }
@@ -56,17 +56,10 @@ export class ProductTest {
                         title: "Test Variant",
                         price: 100000,
                         sku: "TEST-001",
-                        inventory_quantity: 50,
+                        available: 50,
+                        cost: 50000,
                         inventory_policy: "deny",
-                        option1: "Standard",
-                        inventory_item: {
-                            create: {
-                                sku: "TEST-001",
-                                tracked: true,
-                                available: 50,
-                                cost: 50000
-                            }
-                        }
+                        option1: "Standard"
                     }
                 }
             },
@@ -77,6 +70,15 @@ export class ProductTest {
     }
 
     static async delete() {
+        // Delete variants first to avoid foreign key issues
+        await prismaClient.variant.deleteMany({
+            where: {
+                sku: {
+                    in: ["TEST-001", "FIG-KAELA-001", "UPDATED-SKU"]
+                }
+            }
+        })
+
         await prismaClient.product.deleteMany({
             where: {
                 title: {
@@ -114,17 +116,10 @@ export class VariantTest {
                         title: "Test Variant",
                         price: 100000,
                         sku: "TEST-VARIANT-001",
-                        inventory_quantity: 50,
+                        available: 50,
+                        cost: 50000,
                         inventory_policy: "deny",
-                        option1: "Standard",
-                        inventory_item: {
-                            create: {
-                                sku: "TEST-VARIANT-001",
-                                tracked: true,
-                                available: 50,
-                                cost: 50000
-                            }
-                        }
+                        option1: "Standard"
                     }
                 }
             },
@@ -147,9 +142,6 @@ export class VariantTest {
         return await prismaClient.variant.findFirst({
             where: {
                 sku: sku
-            },
-            include: {
-                inventory_item: true
             }
         })
     }

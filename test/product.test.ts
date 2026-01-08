@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "bun:test"
+import { describe, it, expect, afterEach, beforeEach } from "bun:test"
 import app from "../src"
 import { logger } from "../src/Application/logging"
 import { UserTest, ProductTest } from "./test-utils"
@@ -7,7 +7,14 @@ import { CreateProductRequest } from "../src/model/product-model"
 describe('POST /api/products', () => {
     afterEach(async () => {
         await ProductTest.delete()
+        await UserTest.delete()
     })
+
+    beforeEach(async () => {
+        await ProductTest.delete()
+        await UserTest.delete()
+    })
+
 
     it('should create product successfully', async () => {
         await UserTest.create()
@@ -43,12 +50,8 @@ describe('POST /api/products', () => {
                         sku: "FIG-KAELA-001",
                         inventory_policy: "deny",
                         option1: "Standard",
-                        inventory_item: {
-                            sku: "FIG-KAELA-001",
-                            tracked: true,
-                            available: 100,
-                            cost: 500000
-                        }
+                        available: 30,
+                        cost: 100000
                     }
                 ]
             })
@@ -70,7 +73,7 @@ describe('POST /api/products', () => {
         expect(body.data.variants[0].title).toBe("Default Variant")
         expect(body.data.variants[0].price).toBe(800000)
         expect(body.data.variants[0].sku).toBe("FIG-KAELA-001")
-        expect(body.data.variants[0].inventory_quantity).toBe(100)
+        expect(body.data.variants[0].available).toBe(30)
     })
 
     it('should reject create product if request is invalid', async () => {
@@ -131,12 +134,8 @@ describe('POST /api/products', () => {
                         sku: "FIG-KAELA-001",
                         inventory_policy: "deny",
                         option1: "Standard",
-                        inventory_item: {
-                            sku: "FIG-KAELA-001",
-                            tracked: true,
-                            available: 100,
-                            cost: 500000
-                        }
+                        available: 30,
+                        cost: 100000
                     }
                 ]
             })
@@ -225,7 +224,8 @@ describe('GET /api/products/:uuid', () => {
         expect(body.data.product_type).toBe("Collectible")
         expect(body.data.variants).toBeDefined()
         expect(body.data.variants.length).toBe(1)
-        expect(body.data.variants[0].inventory_item).toBeDefined()
+        expect(body.data.variants[0].available).toBe(50)
+        expect(body.data.variants[0].cost).toBe(50000)
     })
 })
 
@@ -263,9 +263,8 @@ describe('PATCH /api/products/:uuid', () => {
                     {
                         uuid: product!.variants[0].uuid,
                         price: 900000,
-                        inventory_item: {
-                            available: 90
-                        }
+                        available: 30,
+                        cost: 100000
                     }
                 ]
             })
@@ -278,7 +277,7 @@ describe('PATCH /api/products/:uuid', () => {
         expect(body.data).toBeDefined()
         expect(body.data.title).toBe("Updated Product")
         expect(body.data.variants[0].price).toBe(900000)
-        expect(body.data.variants[0].inventory_quantity).toBe(90)
+        expect(body.data.variants[0].available).toBe(30)
     })
 })
 
