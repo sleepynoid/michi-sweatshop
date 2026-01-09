@@ -365,18 +365,19 @@ export class ProductService {
             throw new HTTPException(404, { message: "Product not found" });
         }
 
-        // Get the next position for the image
-        const existingImagesCount = await prismaClient.image.count({
-            where: {
-                productId: productId
-            }
+        // Get the next position for the image - find max position and add 1
+        const maxPositionImage = await prismaClient.image.findFirst({
+            where: { productId: productId },
+            orderBy: { position: 'desc' },
+            select: { position: true }
         });
+        const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
 
         const image = await prismaClient.image.create({
             data: {
                 url: request.url,
                 alt_text: request.alt_text,
-                position: request.position ?? existingImagesCount,
+                position: request.position ?? nextPosition,
                 productId: productId
             }
         });
@@ -430,17 +431,20 @@ export class ProductService {
         // Get file stats
         const stats = await fs.stat(filePath);
 
-        // Calculate position
-        const existingImagesCount = await prismaClient.image.count({
-            where: { productId }
+        // Calculate position - find max position and add 1
+        const maxPositionImage = await prismaClient.image.findFirst({
+            where: { productId },
+            orderBy: { position: 'desc' },
+            select: { position: true }
         });
+        const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
 
         // Save to database
         const image = await prismaClient.image.create({
             data: {
                 url: `/uploads/products/${productId}/${uniqueFilename}`,
                 alt_text: request.altText,
-                position: request.position ?? existingImagesCount,
+                position: request.position ?? nextPosition,
                 productId,
                 filename: uniqueFilename,
                 size: stats.size,
