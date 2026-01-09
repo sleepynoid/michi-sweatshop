@@ -211,7 +211,21 @@ export const openApiSpec = {
                                 inventory_policy: { type: 'string' },
                                 option1: { type: 'string' },
                                 created_at: { type: 'string', format: 'date-time' },
-                                updated_at: { type: 'string', format: 'date-time' }
+                                updated_at: { type: 'string', format: 'date-time' },
+                                images: {
+                                  type: 'array',
+                                  items: {
+                                    type: 'object',
+                                    properties: {
+                                      uuid: { type: 'string' },
+                                      url: { type: 'string' },
+                                      alt_text: { type: 'string', nullable: true },
+                                      position: { type: 'number' },
+                                      productId: { type: 'string' },
+                                      variantId: { type: 'string' }
+                                    }
+                                  }
+                                }
                               }
                             }
                           },
@@ -461,7 +475,21 @@ export const openApiSpec = {
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
-                              updated_at: { type: 'string', format: 'date-time' }
+                              updated_at: { type: 'string', format: 'date-time' },
+                              images: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    uuid: { type: 'string' },
+                                    url: { type: 'string' },
+                                    alt_text: { type: 'string', nullable: true },
+                                    position: { type: 'number' },
+                                    productId: { type: 'string' },
+                                    variantId: { type: 'string' }
+                                  }
+                                }
+                              }
                             }
                           }
                         },
@@ -774,7 +802,21 @@ export const openApiSpec = {
                               inventory_policy: { type: 'string' },
                               option1: { type: 'string' },
                               created_at: { type: 'string', format: 'date-time' },
-                              updated_at: { type: 'string', format: 'date-time' }
+                              updated_at: { type: 'string', format: 'date-time' },
+                              images: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    uuid: { type: 'string' },
+                                    url: { type: 'string' },
+                                    alt_text: { type: 'string', nullable: true },
+                                    position: { type: 'number' },
+                                    productId: { type: 'string' },
+                                    variantId: { type: 'string' }
+                                  }
+                                }
+                              }
                             }
                           }
                         },
