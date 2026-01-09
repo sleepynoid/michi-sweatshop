@@ -100,7 +100,11 @@ export class ProductService {
                 take: limit,
                 orderBy: { created_at: 'desc' },
                 include: {
-                    variants: true,
+                    variants: {
+                        include: {
+                            images: true
+                        }
+                    },
                     images: true
                 }
             }),
@@ -132,7 +136,8 @@ export class ProductService {
                     inventory_policy: variant.inventory_policy,
                     option1: variant.option1,
                     created_at: variant.created_at,
-                    updated_at: variant.updated_at
+                    updated_at: variant.updated_at,
+                    images: variant.images
                 }))
             })),
             pagination: {
@@ -153,7 +158,11 @@ export class ProductService {
                 uuid: productId
             },
             include: {
-                variants: true,
+                variants: {
+                    include: {
+                        images: true
+                    }
+                },
                 images: true
             }
         });
@@ -184,7 +193,8 @@ export class ProductService {
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
-                updated_at: variant.updated_at
+                updated_at: variant.updated_at,
+                images: variant.images
             }))
         };
     }
@@ -198,7 +208,11 @@ export class ProductService {
                 uuid: productId
             },
             include: {
-                variants: true,
+                variants: {
+                    include: {
+                        images: true
+                    }
+                },
                 images: true
             }
         });
@@ -229,7 +243,8 @@ export class ProductService {
                 inventory_policy: variant.inventory_policy,
                 option1: variant.option1,
                 created_at: variant.created_at,
-                updated_at: variant.updated_at
+                updated_at: variant.updated_at,
+                images: variant.images
             }))
         };
     }
