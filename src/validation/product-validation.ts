@@ -17,11 +17,22 @@ export class ProductValidation {
       available: z.number().int().min(0, 'Available must be non-negative'),
       cost: z.number().int().min(0, 'Cost must be non-negative'),
       images: z.array(z.object({
-        url: z.string().url('Image URL must be valid'),
-        alt_text: z.string().optional(),
+        url: z.string().min(1, 'Image URL must not be empty').refine(
+          (val) => val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/'),
+          { message: 'Image URL must be a valid URL or path starting with /' }
+        ),
+        alt_text: z.string().nullable().optional(),
         position: z.number().int().optional()
       })).optional()
-    })).min(1, 'At least one variant is required')
+    })).min(1, 'At least one variant is required'),
+    images: z.array(z.object({
+      url: z.string().min(1, 'Image URL must not be empty').refine(
+        (val) => val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/'),
+        { message: 'Image URL must be a valid URL or path starting with /' }
+      ),
+      alt_text: z.string().nullable().optional(),
+      position: z.number().int().optional()
+    })).optional()
   });
 
   static readonly UPDATE = z.object({
@@ -41,10 +52,21 @@ export class ProductValidation {
       available: z.number().int().min(0, 'Available must be non-negative').optional(),
       cost: z.number().int().min(0, 'Cost must be non-negative').optional(),
       images: z.array(z.object({
-        url: z.string().url('Image URL must be valid'),
-        alt_text: z.string().optional(),
+        url: z.string().min(1, 'Image URL must not be empty').refine(
+          (val) => val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/'),
+          { message: 'Image URL must be a valid URL or path starting with /' }
+        ),
+        alt_text: z.string().nullable().optional(),
         position: z.number().int().optional()
       })).optional()
+    })).optional(),
+    images: z.array(z.object({
+      url: z.string().min(1, 'Image URL must not be empty').refine(
+        (val) => val.startsWith('http://') || val.startsWith('https://') || val.startsWith('/'),
+        { message: 'Image URL must be a valid URL or path starting with /' }
+      ),
+      alt_text: z.string().nullable().optional(),
+      position: z.number().int().optional()
     })).optional()
   });
 }

@@ -76,9 +76,9 @@ describe('POST /api/products', () => {
         expect(body.data.variants[0].available).toBe(30)
     })
 
-    it('should reject create product if request is invalid', async () => {
+    it('should create product with images successfully', async () => {
         await UserTest.create()
-
+        
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
@@ -91,51 +91,34 @@ describe('POST /api/products', () => {
         const token = loginBody.data.token
 
         const response = await app.request('/api/products', {
-            method: 'post',
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                title: "",
-                description: "",
-                product_type: "",
-                vendor: "",
-                tags: [],
-                status: "",
-                variants: []
-            })
-        })
-
-        const body = await response.json()
-        logger.debug(body)
-
-        expect(response.status).toBe(400)
-        expect(body.errors).toBeDefined()
-    })
-
-    it('should reject create product if unauthorized', async () => {
-        const response = await app.request('/api/products', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: "Figure",
-                description: "Figure Kawai Kaela",
-                product_type: "Collectible",
-                vendor: "Kawai",
-                tags: ["figure", "collectible", "kaela"],
+                title: "Product with Images",
+                description: "Test Description",
+                product_type: "Test Type",
+                vendor: "Test Vendor",
+                tags: ["test"],
                 status: "active",
                 variants: [
                     {
                         title: "Default Variant",
-                        price: 800000,
-                        sku: "FIG-KAELA-001",
+                        price: 100000,
+                        sku: "PROD-IMG-001",
                         inventory_policy: "deny",
                         option1: "Standard",
-                        available: 30,
-                        cost: 100000
+                        available: 10,
+                        cost: 50000
+                    }
+                ],
+                images: [
+                    {
+                        url: "http://example.com/image1.jpg",
+                        alt_text: "Image 1",
+                        position: 1
                     }
                 ]
             })
@@ -144,9 +127,84 @@ describe('POST /api/products', () => {
         const body = await response.json()
         logger.debug(body)
 
-        expect(response.status).toBe(401)
-        expect(body.errors).toBeDefined()
+        expect(response.status).toBe(200)
+        expect(body.data.images).toBeDefined()
+        expect(body.data.images.length).toBe(1)
+        expect(body.data.images[0].url).toBe("http://example.com/image1.jpg")
+        expect(body.data.images[0].alt_text).toBe("Image 1")
     })
+
+it('should reject create product if request is invalid', async () => {
+    await UserTest.create()
+
+    const loginResponse = await app.request('/api/users/login', {
+        method: 'post',
+        body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'test123'
+        })
+    })
+
+    const loginBody = await loginResponse.json()
+    const token = loginBody.data.token
+
+    const response = await app.request('/api/products', {
+        method: 'post',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title: "",
+            description: "",
+            product_type: "",
+            vendor: "",
+            tags: [],
+            status: "",
+            variants: []
+        })
+    })
+
+    const body = await response.json()
+    logger.debug(body)
+
+    expect(response.status).toBe(400)
+    expect(body.errors).toBeDefined()
+})
+
+it('should reject create product if unauthorized', async () => {
+    const response = await app.request('/api/products', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title: "Figure",
+            description: "Figure Kawai Kaela",
+            product_type: "Collectible",
+            vendor: "Kawai",
+            tags: ["figure", "collectible", "kaela"],
+            status: "active",
+            variants: [
+                {
+                    title: "Default Variant",
+                    price: 800000,
+                    sku: "FIG-KAELA-001",
+                    inventory_policy: "deny",
+                    option1: "Standard",
+                    available: 30,
+                    cost: 100000
+                }
+            ]
+        })
+    })
+
+    const body = await response.json()
+    logger.debug(body)
+
+    expect(response.status).toBe(401)
+    expect(body.errors).toBeDefined()
+})
 })
 
 describe('GET /api/products', () => {

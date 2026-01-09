@@ -13,5 +13,8 @@
   "devDependencies": {
     "@types/bun": "latest",
     "prisma": "^6.16.2"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
   }
 }
