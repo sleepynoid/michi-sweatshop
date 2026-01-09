@@ -1,7 +1,11 @@
 import { prismaClient } from "../Application/database";
 import { Variant, UpdateVariantRequest, CreateVariantRequest } from "../model/variant-model";
+import { Image } from "../model/image-model";
 import { HTTPException } from "hono/http-exception";
 import { validateUUID } from "../utils/uuid-validator";
+import { promises as fs } from "fs";
+import { randomUUID } from "crypto";
+import path = require("path");
 
 export class VariantService {
     static async create(request: CreateVariantRequest): Promise<Variant> {
@@ -162,5 +166,129 @@ export class VariantService {
             updated_at: variant.updated_at,
             images: variant.images
         };
+    }
+
+    static async uploadImageFile(
+        variantId: string,
+        request: {
+            buffer: Buffer;
+            filename: string;
+            mimeType: string;
+            altText?: string;
+            position?: number;
+        }
+    ): Promise<Image> {
+        // Validate variantId UUID format
+        validateUUID(variantId, "Variant");
+
+        // Validate variant exists and get productId
+        const variant = await prismaClient.variant.findFirst({
+            where: { uuid: variantId }
+        });
+        if (!variant) {
+            throw new HTTPException(404, { message: "Variant not found" });
+        }
+
+        const productId = variant.productId;
+
+        // Generate unique filename
+        const fileExtension = path.extname(request.filename);
+        const uniqueFilename = `${randomUUID()}${fileExtension}`;
+
+        // Ensure upload directory exists (same as product images)
+        const uploadDir = process.env.UPLOAD_DIR || './uploads';
+        const productDir = path.join(uploadDir, 'products', productId);
+        await fs.mkdir(productDir, { recursive: true });
+
+        // Save file
+        const filePath = path.join(productDir, uniqueFilename);
+        await fs.writeFile(filePath, request.buffer);
+
+        // Get file stats
+        const stats = await fs.stat(filePath);
+
+        // Calculate position - find max position for this variant and add 1
+        const maxPositionImage = await prismaClient.image.findFirst({
+            where: { variantId },
+            orderBy: { position: 'desc' },
+            select: { position: true }
+        });
+        const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+
+        // Save to database with both productId and variantId
+        const image = await prismaClient.image.create({
+            data: {
+                url: `/uploads/products/${productId}/${uniqueFilename}`,
+                alt_text: request.altText,
+                position: request.position ?? nextPosition,
+                productId,
+                variantId,
+                filename: uniqueFilename,
+                size: stats.size,
+                mime_type: request.mimeType
+            }
+        });
+
+        return {
+            uuid: image.uuid,
+            url: image.url,
+            alt_text: image.alt_text,
+            position: image.position,
+            created_at: image.created_at,
+            updated_at: image.updated_at,
+            productId: image.productId,
+            variantId: image.variantId,
+            filename: image.filename || uniqueFilename,
+            size: image.size || stats.size,
+            mime_type: image.mime_type || request.mimeType
+        };
+    }
+
+    static async deleteImage(variantId: string, imageId: string): Promise<boolean> {
+        // Validate UUIDs
+        validateUUID(variantId, "Variant");
+        validateUUID(imageId, "Image");
+
+        // Check if variant exists
+        const variant = await prismaClient.variant.findFirst({
+            where: { uuid: variantId }
+        });
+
+        if (!variant) {
+            throw new HTTPException(404, { message: "Variant not found" });
+        }
+
+        // Find the image
+        const image = await prismaClient.image.findFirst({
+            where: {
+                uuid: imageId,
+                variantId: variantId
+            }
+        });
+
+        if (!image) {
+            throw new HTTPException(404, { message: "Image not found" });
+        }
+
+        // If image is stored locally (starts with /uploads/), delete the file
+        if (image.url.startsWith('/uploads/') && image.filename) {
+            const uploadDir = process.env.UPLOAD_DIR || './uploads';
+            const productId = variant.productId;
+            const filePath = path.join(uploadDir, 'products', productId, image.filename);
+
+            try {
+                await fs.unlink(filePath);
+            } catch (error) {
+                // File might not exist, continue with database deletion
+                console.warn(`Could not delete file: ${filePath}`);
+            }
+        }
+
+        // Delete from database
+        await prismaClient.image.delete({
+            where: { uuid: imageId }
+        });
+
+        return true;
     }
 }

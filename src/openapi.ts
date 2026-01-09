@@ -1437,6 +1437,179 @@ export const openApiSpec = {
           }
         }
       }
+    },
+    '/api/variants/{uuid}/images/upload': {
+      post: {
+        summary: 'Upload variant image',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'uuid',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Variant UUID'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                required: ['image'],
+                properties: {
+                  image: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'Image file to upload (max 2MB)'
+                  },
+                  alt_text: {
+                    type: 'string',
+                    description: 'Alternative text for the image'
+                  },
+                  position: {
+                    type: 'integer',
+                    description: 'Display position of the image'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Image uploaded successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'object',
+                      properties: {
+                        uuid: { type: 'string' },
+                        url: { type: 'string' },
+                        alt_text: { type: 'string', nullable: true },
+                        position: { type: 'number' },
+                        productId: { type: 'string' },
+                        variantId: { type: 'string' },
+                        filename: { type: 'string' },
+                        size: { type: 'number' },
+                        mime_type: { type: 'string' },
+                        created_at: { type: 'string', format: 'date-time' },
+                        updated_at: { type: 'string', format: 'date-time' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: {
+            description: 'Bad request (no file, invalid file type, or file too large)',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Variant not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/variants/{uuid}/images/{imageId}': {
+      delete: {
+        summary: 'Delete variant image',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'uuid',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Variant UUID'
+          },
+          {
+            name: 'imageId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Image UUID'
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Image deleted successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'boolean' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Variant or image not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   components: {

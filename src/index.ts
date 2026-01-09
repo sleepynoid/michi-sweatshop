@@ -87,6 +87,8 @@ app.use('/api/variants/:uuid', (c, next) => {
   return next()
 })  // PATCH, DELETE require auth, GET doesn't
 
+app.use('/api/variants/:uuid/images/*', authMiddleware)  // All variant image operations require auth
+
 // Serve uploaded images
 app.use('/uploads/*', serveStatic({ root: './' }))
 
