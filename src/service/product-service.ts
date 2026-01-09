@@ -40,6 +40,7 @@ export class ProductService {
                                 alt_text: image.alt_text,
                                 position: image.position ?? index,
                                 productId: productUuid
+                                // variantId will be set automatically by Prisma nested create
                             }))
                         } : undefined
                     }))
