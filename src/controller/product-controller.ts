@@ -115,6 +115,17 @@ ProductController.post('/api/products/:uuid/images/upload', async (c) => {
     return c.json({ data: response })
 })
 
+ProductController.patch('/api/products/:uuid/images/reorder', async (c) => {
+    const productId = c.req.param('uuid')
+    const body = await c.req.json() as { items: { imageId: string, position: number }[] }
+
+    const response = await ProductService.reorderImages(productId, body.items)
+
+    return c.json({
+        data: response
+    })
+})
+
 ProductController.delete('/api/products/:uuid/images/:imageId', async (c) => {
     const productId = c.req.param('uuid')
     const imageId = c.req.param('imageId')

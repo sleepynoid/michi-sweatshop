@@ -48,7 +48,7 @@ export class ProductService {
                 images: request.images ? {
                     create: request.images.map((image, index) => ({
                         url: image.url,
-                        alt_text: image.alt_text,
+                        alt_text: image.alt_text ?? undefined,
                         position: image.position ?? index
                     }))
                 } : undefined
@@ -540,6 +540,41 @@ export class ProductService {
         // Delete from database
         await prismaClient.image.delete({
             where: { uuid: imageId }
+        });
+
+        return true;
+    }
+
+    static async reorderImages(
+        productId: string,
+        updates: Array<{ imageId: string; position: number }>
+    ): Promise<boolean> {
+        validateUUID(productId, "Product");
+
+        // Validate product exists
+        const product = await prismaClient.product.findFirst({
+            where: { uuid: productId }
+        });
+
+        if (!product) {
+            throw new HTTPException(404, { message: "Product not found" });
+        }
+
+        // Use transaction for batch update
+        await prismaClient.$transaction(async (tx) => {
+            for (const item of updates) {
+                validateUUID(item.imageId, "Image");
+
+                // Update each image position
+                // Note: We check productId to ensure image belongs to this product
+                await tx.image.updateMany({
+                    where: {
+                        uuid: item.imageId,
+                        productId: productId
+                    },
+                    data: { position: item.position }
+                });
+            }
         });
 
         return true;

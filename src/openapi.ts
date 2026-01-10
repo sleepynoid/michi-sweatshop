@@ -1063,6 +1063,86 @@ export const openApiSpec = {
         }
       }
     },
+    '/api/products/{uuid}/images/reorder': {
+      patch: {
+        summary: 'Reorder product images',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'uuid',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Product UUID'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['items'],
+                properties: {
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: ['imageId', 'position'],
+                      properties: {
+                        imageId: { type: 'string' },
+                        position: { type: 'integer' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Images reordered successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'boolean' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Product not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     '/api/products/{uuid}/images/{imageId}': {
       delete: {
         summary: 'Delete product image',
@@ -1514,6 +1594,86 @@ export const openApiSpec = {
                   type: 'object',
                   properties: {
                     errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          401: {
+            description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          },
+          404: {
+            description: 'Variant not found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    errors: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/variants/{uuid}/images/reorder': {
+      patch: {
+        summary: 'Reorder variant images',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'uuid',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            description: 'Variant UUID'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['items'],
+                properties: {
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: ['imageId', 'position'],
+                      properties: {
+                        imageId: { type: 'string' },
+                        position: { type: 'integer' }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Images reordered successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    data: { type: 'boolean' }
                   }
                 }
               }

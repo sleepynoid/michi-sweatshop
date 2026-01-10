@@ -65,6 +65,13 @@ app.use('/api/products/:uuid/images/:imageId', (c, next) => {
   return next()
 })  // DELETE requires auth
 
+app.use('/api/products/:uuid/images/reorder', (c, next) => {
+  if (c.req.method === 'PATCH') {
+    return authMiddleware(c, next)
+  }
+  return next()
+})  // PATCH requires auth
+
 
 app.use('/api/products/:uuid/images/upload', (c, next) => {
   if (c.req.method === 'POST') {

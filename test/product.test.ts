@@ -708,5 +708,75 @@ describe('POST /api/products/:uuid/images', () => {
 
         logger.debug({ message: 'Concurrent upload test passed', positions: sortedPositions })
     })
+
+    it('should reorder images successfully', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                email: 'test@example.com',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // 1. Upload 2 images
+        const images = []
+        for (let i = 0; i < 2; i++) {
+            const formData = new FormData()
+            const testImageBuffer = Buffer.from(`fake image content ${i}`)
+            const testFile = new File([testImageBuffer], `test${i}.jpg`, { type: 'image/jpeg' })
+
+            formData.append('image', testFile)
+            formData.append('alt_text', `Test Image ${i}`)
+
+            const response = await app.request(`/api/products/${product!.uuid}/images/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+            const body = await response.json()
+            images.push(body.data)
+        }
+
+        // Initial check: positions should be 0 and 1
+        expect(images[0].position).toBe(0)
+        expect(images[1].position).toBe(1)
+
+        // 2. Reorder: Swap positions
+        const reorderPayload = {
+            items: [
+                { imageId: images[0].uuid, position: 1 },
+                { imageId: images[1].uuid, position: 0 }
+            ]
+        }
+
+        const reorderResponse = await app.request(`/api/products/${product!.uuid}/images/reorder`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reorderPayload)
+        })
+
+        expect(reorderResponse.status).toBe(200)
+
+        // 3. Verify changes
+        const detailResponse = await app.request(`/api/products/${product!.uuid}/detail`)
+        const detailBody = await detailResponse.json()
+        const updatedImages = detailBody.data.images
+
+        const img0 = updatedImages.find((img: any) => img.uuid === images[0].uuid)
+        const img1 = updatedImages.find((img: any) => img.uuid === images[1].uuid)
+
+        expect(img0.position).toBe(1)
+        expect(img1.position).toBe(0)
+    })
 })
 

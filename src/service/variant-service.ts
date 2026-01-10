@@ -305,4 +305,39 @@ export class VariantService {
 
         return true;
     }
+
+    static async reorderImages(
+        variantId: string,
+        updates: Array<{ imageId: string; position: number }>
+    ): Promise<boolean> {
+        validateUUID(variantId, "Variant");
+
+        // Validate variant exists
+        const variant = await prismaClient.variant.findFirst({
+            where: { uuid: variantId }
+        });
+
+        if (!variant) {
+            throw new HTTPException(404, { message: "Variant not found" });
+        }
+
+        // Use transaction for batch update
+        await prismaClient.$transaction(async (tx) => {
+            for (const item of updates) {
+                validateUUID(item.imageId, "Image");
+
+                // Update each image position
+                // Note: We check variantId to ensure image belongs to this variant
+                await tx.image.updateMany({
+                    where: {
+                        uuid: item.imageId,
+                        variantId: variantId
+                    },
+                    data: { position: item.position }
+                });
+            }
+        });
+
+        return true;
+    }
 }

@@ -1009,4 +1009,135 @@ describe('OpenAPI Specification Validation', () => {
             expect(body.errors).toBeDefined()
         })
     })
+
+    describe('PATCH /api/products/{uuid}/images/reorder - Reorder Product Images', () => {
+        it('should match OpenAPI spec for successful reorder', async () => {
+            const timestamp = Date.now();
+            // Create temp product for this test
+            const prodRes = await app.request('/api/products', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: `Reorder Prod ${timestamp}`,
+                    description: "Test Reorder Description",
+                    product_type: "Test",
+                    vendor: "Test",
+                    status: "active",
+                    tags: ["reorder"],
+                    variants: [{
+                        title: "V1", price: 100, sku: `VR-PROD-${timestamp}`, inventory_policy: "deny", option1: "A", available: 10, cost: 50
+                    }],
+                    images: [{ url: "http://e.com/1.jpg", position: 0 }, { url: "http://e.com/2.jpg", position: 1 }]
+                })
+            })
+            const prodBody = await prodRes.json()
+            if (prodRes.status !== 200) {
+                console.error("Create product failed:", prodBody)
+                throw new Error("Setup failed: Create product failed")
+            }
+            const prod = prodBody.data
+
+            const response = await app.request(`/api/products/${prod.uuid}/images/reorder`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: [
+                        { imageId: prod.images[1].uuid, position: 0 },
+                        { imageId: prod.images[0].uuid, position: 1 }
+                    ]
+                })
+            })
+
+            const body = await response.json()
+            logger.debug('Reorder product images response:', body)
+
+            expect(response.status).toBe(200)
+            expect(body.data).toBe(true)
+        })
+
+        it('should match OpenAPI spec for unauthorized (401)', async () => {
+            // Use dummy UUID for unauthorized check, auth middleware should catch it first
+            const response = await app.request(`/api/products/123e4567-e89b-12d3-a456-426614174000/images/reorder`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: []
+                })
+            })
+
+            const body = await response.json()
+            expect(response.status).toBe(401)
+            expect(body.errors).toBeDefined()
+        })
+    })
+
+    describe('PATCH /api/variants/{uuid}/images/reorder - Reorder Variant Images', () => {
+        it('should match OpenAPI spec for successful reorder', async () => {
+            const timestamp = Date.now();
+            // Create temp product
+            const prodRes = await app.request('/api/products', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: `Variant Reorder ${timestamp}`,
+                    description: "Test Variant Reorder Description",
+                    product_type: "Test",
+                    vendor: "Test",
+                    status: "active",
+                    tags: ["reorder-var"],
+                    variants: [{
+                        title: "V1", price: 100, sku: `VR-${timestamp}`, inventory_policy: "deny", option1: "A", available: 10, cost: 50,
+                        images: [{ url: "http://e.com/v1.jpg", position: 0 }]
+                    }]
+                })
+            })
+            const prodBody = await prodRes.json()
+            if (prodRes.status !== 200) {
+                console.error("Create product failed:", prodBody)
+                throw new Error("Setup failed: Create product failed")
+            }
+            const prod = prodBody.data
+            const variant = prod.variants[0]
+
+            const response = await app.request(`/api/variants/${variant.uuid}/images/reorder`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: [
+                        { imageId: variant.images[0].uuid, position: 0 }
+                    ]
+                })
+            })
+
+            const body = await response.json()
+            logger.debug('Reorder variant images response:', body)
+
+            expect(response.status).toBe(200)
+            expect(body.data).toBe(true)
+        })
+
+        it('should match OpenAPI spec for unauthorized (401)', async () => {
+            const response = await app.request(`/api/variants/123e4567-e89b-12d3-a456-426614174000/images/reorder`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    items: []
+                })
+            })
+
+            const body = await response.json()
+            expect(response.status).toBe(401)
+            expect(body.errors).toBeDefined()
+        })
+    })
 })

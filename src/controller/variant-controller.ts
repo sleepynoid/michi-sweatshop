@@ -73,6 +73,17 @@ VariantController.post('/api/variants/:uuid/images/upload', async (c) => {
     return c.json({ data: response })
 })
 
+VariantController.patch('/api/variants/:uuid/images/reorder', async (c) => {
+    const variantId = c.req.param('uuid')
+    const body = await c.req.json() as { items: { imageId: string, position: number }[] }
+
+    const response = await VariantService.reorderImages(variantId, body.items)
+
+    return c.json({
+        data: response
+    })
+})
+
 VariantController.delete('/api/variants/:uuid/images/:imageId', async (c) => {
     const variantId = c.req.param('uuid')
     const imageId = c.req.param('imageId')
