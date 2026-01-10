@@ -447,23 +447,27 @@ export class ProductService {
         // Get file stats
         const stats = await fs.stat(filePath);
 
-        // Use PostgreSQL advisory lock to prevent race conditions
-        // Lock is based on productId hash, released automatically at transaction end
+        // Use SELECT FOR UPDATE to lock rows and prevent race conditions
+        // Lock the parent product row to serialize access for position calculation
         const image = await prismaClient.$transaction(async (tx) => {
-            // Convert UUID to integer for advisory lock (use first 8 chars as hex)
-            const lockId = parseInt(productId.replace(/-/g, '').substring(0, 8), 16);
+            // Lock the product row to prevent concurrent position conflicts
+            // This works even when there are no images yet (unlike locking image rows)
+            await tx.$queryRaw`
+                SELECT uuid 
+                FROM "Product" 
+                WHERE uuid = ${productId}::uuid
+                FOR UPDATE
+            `;
 
-            // Acquire advisory lock for this product
-            // This ensures only one request can calculate position at a time
-            await tx.$executeRawUnsafe(`SELECT pg_advisory_xact_lock(${lockId})`);
+            // Now safely get max position (product is locked, serializing all uploads)
+            const maxPositionResult = await tx.$queryRaw<Array<{ max: number | null }>>`
+                SELECT MAX(position) as max
+                FROM "Image" 
+                WHERE "productId" = ${productId}::uuid
+            `;
 
-            // Now safely calculate position
-            const maxPositionImage = await tx.image.findFirst({
-                where: { productId },
-                orderBy: { position: 'desc' },
-                select: { position: true }
-            });
-            const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+            const maxPosition = maxPositionResult[0]?.max;
+            const nextPosition = maxPosition !== null ? maxPosition + 1 : 0;
 
             // Create image with calculated position
             return await tx.image.create({

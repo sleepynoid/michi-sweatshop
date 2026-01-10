@@ -78,7 +78,7 @@ describe('POST /api/products', () => {
 
     it('should create product with images successfully', async () => {
         await UserTest.create()
-        
+
         const loginResponse = await app.request('/api/users/login', {
             method: 'post',
             body: JSON.stringify({
@@ -134,77 +134,77 @@ describe('POST /api/products', () => {
         expect(body.data.images[0].alt_text).toBe("Image 1")
     })
 
-it('should reject create product if request is invalid', async () => {
-    await UserTest.create()
+    it('should reject create product if request is invalid', async () => {
+        await UserTest.create()
 
-    const loginResponse = await app.request('/api/users/login', {
-        method: 'post',
-        body: JSON.stringify({
-            email: 'test@example.com',
-            password: 'test123'
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                email: 'test@example.com',
+                password: 'test123'
+            })
         })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        const response = await app.request('/api/products', {
+            method: 'post',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: "",
+                description: "",
+                product_type: "",
+                vendor: "",
+                tags: [],
+                status: "",
+                variants: []
+            })
+        })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(400)
+        expect(body.errors).toBeDefined()
     })
 
-    const loginBody = await loginResponse.json()
-    const token = loginBody.data.token
-
-    const response = await app.request('/api/products', {
-        method: 'post',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            title: "",
-            description: "",
-            product_type: "",
-            vendor: "",
-            tags: [],
-            status: "",
-            variants: []
+    it('should reject create product if unauthorized', async () => {
+        const response = await app.request('/api/products', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: "Figure",
+                description: "Figure Kawai Kaela",
+                product_type: "Collectible",
+                vendor: "Kawai",
+                tags: ["figure", "collectible", "kaela"],
+                status: "active",
+                variants: [
+                    {
+                        title: "Default Variant",
+                        price: 800000,
+                        sku: "FIG-KAELA-001",
+                        inventory_policy: "deny",
+                        option1: "Standard",
+                        available: 30,
+                        cost: 100000
+                    }
+                ]
+            })
         })
+
+        const body = await response.json()
+        logger.debug(body)
+
+        expect(response.status).toBe(401)
+        expect(body.errors).toBeDefined()
     })
-
-    const body = await response.json()
-    logger.debug(body)
-
-    expect(response.status).toBe(400)
-    expect(body.errors).toBeDefined()
-})
-
-it('should reject create product if unauthorized', async () => {
-    const response = await app.request('/api/products', {
-        method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            title: "Figure",
-            description: "Figure Kawai Kaela",
-            product_type: "Collectible",
-            vendor: "Kawai",
-            tags: ["figure", "collectible", "kaela"],
-            status: "active",
-            variants: [
-                {
-                    title: "Default Variant",
-                    price: 800000,
-                    sku: "FIG-KAELA-001",
-                    inventory_policy: "deny",
-                    option1: "Standard",
-                    available: 30,
-                    cost: 100000
-                }
-            ]
-        })
-    })
-
-    const body = await response.json()
-    logger.debug(body)
-
-    expect(response.status).toBe(401)
-    expect(body.errors).toBeDefined()
-})
 })
 
 describe('GET /api/products', () => {
@@ -647,4 +647,66 @@ describe('POST /api/products/:uuid/images', () => {
         expect(response.status).toBe(400)
         expect(body.errors).toBeDefined()
     })
+
+    it('should handle concurrent image uploads without duplicate positions', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                email: 'test@example.com',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // Create 5 images concurrently
+        const uploadPromises = []
+        for (let i = 0; i < 5; i++) {
+            const formData = new FormData()
+            const testImageBuffer = Buffer.from(`fake image content ${i}`)
+            const testFile = new File([testImageBuffer], `test${i}.jpg`, { type: 'image/jpeg' })
+
+            formData.append('image', testFile)
+            formData.append('alt_text', `Test Image ${i}`)
+            // Don't send position - let backend auto-calculate
+
+            const uploadPromise = app.request(`/api/products/${product!.uuid}/images/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            })
+
+            uploadPromises.push(uploadPromise)
+        }
+
+        // Execute all uploads concurrently
+        const responses = await Promise.all(uploadPromises)
+
+        // All should succeed
+        for (const response of responses) {
+            expect(response.status).toBe(200)
+        }
+
+        // Get all uploaded images
+        const bodies = await Promise.all(responses.map(r => r.json()))
+        const positions = bodies.map(b => b.data.position)
+
+        // Check no duplicate positions
+        const uniquePositions = new Set(positions)
+        expect(uniquePositions.size).toBe(5) // All positions should be unique
+
+        // Positions should be sequential (0, 1, 2, 3, 4)
+        const sortedPositions = [...positions].sort((a, b) => a - b)
+        expect(sortedPositions).toEqual([0, 1, 2, 3, 4])
+
+        logger.debug({ message: 'Concurrent upload test passed', positions: sortedPositions })
+    })
 })
+

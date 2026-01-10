@@ -76,6 +76,8 @@ model Image {
   product     Product? @relation(fields: [productId], references: [uuid], onDelete: Cascade)
   variant     Variant? @relation(fields: [variantId], references: [uuid], onDelete: Cascade)
 
-  @@unique([productId, position])
-  @@unique([variantId, position])
+  // Unique constraints removed to prevent race conditions during concurrent uploads
+  // Position uniqueness is now enforced via SELECT FOR UPDATE in application code
+  @@index([productId, position])
+  @@index([variantId, position])
 }
