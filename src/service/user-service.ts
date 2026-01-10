@@ -81,4 +81,9 @@ export class UserService {
 
         return toUserRespons(user);
     }
+
+    static async list(): Promise<UserResponse[]> {
+        const users = await prismaClient.user.findMany()
+        return users.map(toUserRespons)
+    }
 }

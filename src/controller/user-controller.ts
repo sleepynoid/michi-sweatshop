@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { LoginUserRequest, RegisterUserRequest } from "../model/user-model";
 import { UserService } from "../service/user-service";
+import { authMiddleware } from "../middleware/auth-middleware";
 
 export const UserController = new Hono()
 
@@ -20,6 +21,13 @@ UserController.post('/api/users/login', async (c) => {
 
     const response = await UserService.login(request)
 
+    return c.json({
+        data: response
+    })
+})
+
+UserController.get('/api/users', authMiddleware, async (c) => {
+    const response = await UserService.list()
     return c.json({
         data: response
     })
