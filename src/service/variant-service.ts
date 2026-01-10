@@ -229,11 +229,12 @@ export class VariantService {
             const nextPosition = maxPosition !== null ? maxPosition + 1 : 0;
 
             // Create image with calculated position
+            // Always use nextPosition to append at the end, preserving cover image at position 0
             return await tx.image.create({
                 data: {
                     url: `/uploads/products/${productId}/${uniqueFilename}`,
                     alt_text: request.altText,
-                    position: request.position ?? nextPosition,
+                    position: nextPosition, // Always append to end
                     productId,
                     variantId,
                     filename: uniqueFilename,

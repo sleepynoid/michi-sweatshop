@@ -778,5 +778,90 @@ describe('POST /api/products/:uuid/images', () => {
         expect(img0.position).toBe(1)
         expect(img1.position).toBe(0)
     })
+
+    it('should append new images at the end without changing cover image', async () => {
+        await UserTest.create()
+        await ProductTest.create()
+        const product = await ProductTest.findByTitle('Test Product')
+
+        const loginResponse = await app.request('/api/users/login', {
+            method: 'post',
+            body: JSON.stringify({
+                email: 'test@example.com',
+                password: 'test123'
+            })
+        })
+
+        const loginBody = await loginResponse.json()
+        const token = loginBody.data.token
+
+        // 1. Upload first image (will be at position 0 - cover)
+        const formData1 = new FormData()
+        formData1.append('image', new Blob([Buffer.from('test image 1')], { type: 'image/jpeg' }), 'test1.jpg')
+        formData1.append('alt_text', 'Cover Image')
+
+        const upload1Response = await app.request(`/api/products/${product.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData1
+        })
+
+        expect(upload1Response.status).toBe(200)
+        const upload1Body = await upload1Response.json()
+        const coverImageId = upload1Body.data.uuid
+        expect(upload1Body.data.position).toBe(0)
+
+        // 2. Upload second image (should be at position 1, not replacing cover)
+        const formData2 = new FormData()
+        formData2.append('image', new Blob([Buffer.from('test image 2')], { type: 'image/jpeg' }), 'test2.jpg')
+        formData2.append('alt_text', 'Second Image')
+
+        const upload2Response = await app.request(`/api/products/${product.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData2
+        })
+
+        expect(upload2Response.status).toBe(200)
+        const upload2Body = await upload2Response.json()
+        expect(upload2Body.data.position).toBe(1)
+
+        // 3. Upload third image (should be at position 2)
+        const formData3 = new FormData()
+        formData3.append('image', new Blob([Buffer.from('test image 3')], { type: 'image/jpeg' }), 'test3.jpg')
+        formData3.append('alt_text', 'Third Image')
+
+        const upload3Response = await app.request(`/api/products/${product.uuid}/images/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData3
+        })
+
+        expect(upload3Response.status).toBe(200)
+        const upload3Body = await upload3Response.json()
+        expect(upload3Body.data.position).toBe(2)
+
+        // 4. Verify final state - cover image should still be at position 0
+        const detailResponse = await app.request(`/api/products/${product.uuid}/detail`)
+        const detailBody = await detailResponse.json()
+        const images = detailBody.data.images
+
+        expect(images.length).toBe(3)
+
+        // Cover image should still be at position 0
+        const coverImage = images.find((img: any) => img.uuid === coverImageId)
+        expect(coverImage.position).toBe(0)
+        expect(coverImage.alt_text).toBe('Cover Image')
+
+        // Verify all positions are sequential
+        const positions = images.map((img: any) => img.position).sort((a: number, b: number) => a - b)
+        expect(positions).toEqual([0, 1, 2])
+    })
 })
 
