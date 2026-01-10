@@ -230,13 +230,14 @@ export class VariantService {
 
             // Create image with calculated position
             // Always use nextPosition to append at the end, preserving cover image at position 0
+            // NOTE: Variant images should ONLY have variantId, NOT productId
+            // Setting productId would cause the image to appear in both product and variant
             return await tx.image.create({
                 data: {
                     url: `/uploads/products/${productId}/${uniqueFilename}`,
                     alt_text: request.altText,
                     position: nextPosition, // Always append to end
-                    productId,
-                    variantId,
+                    variantId,  // Only set variantId for variant images
                     filename: uniqueFilename,
                     size: stats.size,
                     mime_type: request.mimeType
