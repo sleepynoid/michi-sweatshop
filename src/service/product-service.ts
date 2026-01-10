@@ -447,25 +447,36 @@ export class ProductService {
         // Get file stats
         const stats = await fs.stat(filePath);
 
-        // Calculate position - find max position and add 1
-        const maxPositionImage = await prismaClient.image.findFirst({
-            where: { productId },
-            orderBy: { position: 'desc' },
-            select: { position: true }
-        });
-        const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+        // Use PostgreSQL advisory lock to prevent race conditions
+        // Lock is based on productId hash, released automatically at transaction end
+        const image = await prismaClient.$transaction(async (tx) => {
+            // Convert UUID to integer for advisory lock (use first 8 chars as hex)
+            const lockId = parseInt(productId.replace(/-/g, '').substring(0, 8), 16);
 
-        // Save to database
-        const image = await prismaClient.image.create({
-            data: {
-                url: `/uploads/products/${productId}/${uniqueFilename}`,
-                alt_text: request.altText,
-                position: request.position ?? nextPosition,
-                productId,
-                filename: uniqueFilename,
-                size: stats.size,
-                mime_type: request.mimeType
-            }
+            // Acquire advisory lock for this product
+            // This ensures only one request can calculate position at a time
+            await tx.$executeRawUnsafe(`SELECT pg_advisory_xact_lock(${lockId})`);
+
+            // Now safely calculate position
+            const maxPositionImage = await tx.image.findFirst({
+                where: { productId },
+                orderBy: { position: 'desc' },
+                select: { position: true }
+            });
+            const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+
+            // Create image with calculated position
+            return await tx.image.create({
+                data: {
+                    url: `/uploads/products/${productId}/${uniqueFilename}`,
+                    alt_text: request.altText,
+                    position: request.position ?? nextPosition,
+                    productId,
+                    filename: uniqueFilename,
+                    size: stats.size,
+                    mime_type: request.mimeType
+                }
+            });
         });
 
         return {

@@ -207,26 +207,37 @@ export class VariantService {
         // Get file stats
         const stats = await fs.stat(filePath);
 
-        // Calculate position - find max position for this variant and add 1
-        const maxPositionImage = await prismaClient.image.findFirst({
-            where: { variantId },
-            orderBy: { position: 'desc' },
-            select: { position: true }
-        });
-        const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+        // Use PostgreSQL advisory lock to prevent race conditions
+        // Lock is based on variantId hash, released automatically at transaction end
+        const image = await prismaClient.$transaction(async (tx) => {
+            // Convert UUID to integer for advisory lock (use first 8 chars as hex)
+            const lockId = parseInt(variantId.replace(/-/g, '').substring(0, 8), 16);
 
-        // Save to database with both productId and variantId
-        const image = await prismaClient.image.create({
-            data: {
-                url: `/uploads/products/${productId}/${uniqueFilename}`,
-                alt_text: request.altText,
-                position: request.position ?? nextPosition,
-                productId,
-                variantId,
-                filename: uniqueFilename,
-                size: stats.size,
-                mime_type: request.mimeType
-            }
+            // Acquire advisory lock for this variant
+            // This ensures only one request can calculate position at a time
+            await tx.$executeRawUnsafe(`SELECT pg_advisory_xact_lock(${lockId})`);
+
+            // Now safely calculate position
+            const maxPositionImage = await tx.image.findFirst({
+                where: { variantId },
+                orderBy: { position: 'desc' },
+                select: { position: true }
+            });
+            const nextPosition = maxPositionImage ? maxPositionImage.position + 1 : 0;
+
+            // Create image with calculated position
+            return await tx.image.create({
+                data: {
+                    url: `/uploads/products/${productId}/${uniqueFilename}`,
+                    alt_text: request.altText,
+                    position: request.position ?? nextPosition,
+                    productId,
+                    variantId,
+                    filename: uniqueFilename,
+                    size: stats.size,
+                    mime_type: request.mimeType
+                }
+            });
         });
 
         return {
